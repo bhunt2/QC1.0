@@ -235,7 +235,7 @@ int main(int argc, char* argv[])
 
 	//! [file_read]
 	Settings s;
-	const string inputSettingsFile = argc > 1 ? argv[1] : "C:\OpenCV\OpenCV310\opencv\sources\samples\cpp\tutorial_code\calib3d\camera_calibration\in_VID5.xml";
+	const string inputSettingsFile = argc > 1 ? argv[1] : "F:\OpenCV\OpenCV310\opencv\sources\samples\cpp\tutorial_code\calib3d\camera_calibration\in_VID5.xml";
 	FileStorage fs(inputSettingsFile, FileStorage::READ); // Read the settings
 	if (!fs.isOpened())
 	{
@@ -407,7 +407,7 @@ int main(int argc, char* argv[])
 		}
 		else
 		{
-			cv::initUndistortRectifyMap(
+			initUndistortRectifyMap(
 				cameraMatrix, distCoeffs, Mat(),
 				getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize,
 				CV_16SC2, map1, map2);
@@ -426,15 +426,49 @@ int main(int argc, char* argv[])
 		}
 	}
 	//! [show_results]
-	cv::Matx33d newCameraMatrix = (
-		3.4664441278250825e+02, 0, 3.1950000000000000e+02,
-		0,	3.4664441278250825e+02, 2.3950000000000000e+02,
+
+	/*cv::Matx33d newCameraMatrix = (
+		3.5506343877920330e+02, 0, 3.1950000000000000e+02,
+		0, 3.5506343877920330e+02, 2.3950000000000000e+02,
 		0, 0, 1
-	);
-	
+		);*/
+
+	cv::Mat cam(3, 3, cv::DataType<float>::type);
+	cam.at<float>(0, 0) = 3.5506343877920330e+02f;
+	cam.at<float>(0, 1) = 0.0f;
+	cam.at<float>(0, 2) = 0.0f;
+
+	cam.at<float>(1, 0) = 0.0f;
+	cam.at<float>(1, 1) = 3.5506343877920330e+02f;
+	cam.at<float>(1, 2) = 0.0f;
+
+	cam.at<float>(2, 0) = 3.1950000000000000e+02f;
+	cam.at<float>(2, 1) = 2.3950000000000000e+02f;
+	cam.at<float>(2, 2) = 1.0f;
+
+	//cv::Matx61d distCoeffs = (-3.5995154392366774e-01, 1.3197626987829977e-01, 0, 0,
+	//	7.7509492660468582e-03, 0);
+	cv::Mat dist(5, 1, cv::DataType<float>::type);
+	dist.at<float>(0, 0) = -3.5995154392366774e-01f;
+	dist.at<float>(1, 0) = 1.3197626987829977e-01f;
+	dist.at<float>(2, 0) = 0.0f;
+	dist.at<float>(3, 0) = 0.0f;
+	dist.at<float>(4, 0) = 7.7509492660468582e-03f;
+
+
 	Mat R, map1, map2;
-	cv::initUndistortRectifyMap(cameraMatrix, distCoeffs, R, newCameraMatrix, Size(640, 480), CV_16SC2, map1, map2);
-	cv::remap(src, dst, map1, map2, interpolation, int, bordervalue);
+	cv::Mat src;
+	src = (argv[1], 1);
+	//map1 = cvCreateImage(cvGetSize(src), IPL_DEPTH_16S, 1);
+
+	cv::initUndistortRectifyMap(cameraMatrix, distCoeffs, Matx33d::eye(), cam, Size(640, 480), CV_16SC2, map1, map2);
+
+	//Mat dst;
+	//src = (argv[1], 1);
+	cv::remap(cam, dist, map1, map2, CV_INTER_LINEAR);
+	
+	namedWindow("REMAP_WINDOW", CV_WINDOW_AUTOSIZE);
+	imshow("REMAP_WINDOW", dist);
 
 	return 0;
 }
