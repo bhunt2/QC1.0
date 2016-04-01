@@ -235,7 +235,7 @@ int main(int argc, char* argv[])
 
 	//! [file_read]
 	Settings s;
-	const string inputSettingsFile = argc > 1 ? argv[1] : "F:\OpenCV\OpenCV310\opencv\sources\samples\cpp\tutorial_code\calib3d\camera_calibration\in_VID5.xml";
+	const string inputSettingsFile = argc > 1 ? argv[1] : "C:\OpenCV\OpenCV310\opencv\sources\samples\cpp\tutorial_code\calib3d\camera_calibration\in_VID5.xml";
 	FileStorage fs(inputSettingsFile, FileStorage::READ); // Read the settings
 	if (!fs.isOpened())
 	{
@@ -257,6 +257,7 @@ int main(int argc, char* argv[])
 
 	vector<vector<Point2f> > imagePoints;
 	Mat cameraMatrix, distCoeffs;
+	
 	Size imageSize;
 	int mode = s.inputType == Settings::IMAGE_LIST ? CAPTURING : DETECTION;
 	clock_t prevTimestamp = 0;
@@ -433,7 +434,7 @@ int main(int argc, char* argv[])
 		0, 0, 1
 		);*/
 
-	cv::Mat cam(3, 3, cv::DataType<float>::type);
+	/*cv::Mat cam(3, 3, cv::DataType<float>::type);
 	cam.at<float>(0, 0) = 3.5506343877920330e+02f;
 	cam.at<float>(0, 1) = 0.0f;
 	cam.at<float>(0, 2) = 0.0f;
@@ -444,11 +445,11 @@ int main(int argc, char* argv[])
 
 	cam.at<float>(2, 0) = 3.1950000000000000e+02f;
 	cam.at<float>(2, 1) = 2.3950000000000000e+02f;
-	cam.at<float>(2, 2) = 1.0f;
+	cam.at<float>(2, 2) = 1.0f; */
 
 	//cv::Matx61d distCoeffs = (-3.5995154392366774e-01, 1.3197626987829977e-01, 0, 0,
 	//	7.7509492660468582e-03, 0);
-	cv::Mat dist(5, 1, cv::DataType<float>::type);
+	/*cv::Mat dist(5, 1, cv::DataType<float>::type);
 	dist.at<float>(0, 0) = -3.5995154392366774e-01f;
 	dist.at<float>(1, 0) = 1.3197626987829977e-01f;
 	dist.at<float>(2, 0) = 0.0f;
@@ -468,7 +469,7 @@ int main(int argc, char* argv[])
 	cv::remap(cam, dist, map1, map2, CV_INTER_LINEAR);
 	
 	namedWindow("REMAP_WINDOW", CV_WINDOW_AUTOSIZE);
-	imshow("REMAP_WINDOW", dist);
+	imshow("REMAP_WINDOW", dist);*/
 
 	return 0;
 }
