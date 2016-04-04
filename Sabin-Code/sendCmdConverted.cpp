@@ -1,22 +1,29 @@
-void send_cmd(uint8_t code, uint8_t data, uint8_t data_length)
+void send_cmd(uint8_t opcode, uint8_t* data, uint8_t data_length)
 {
 	uint8_t checksum = 0;
 
-	char header[] = "$M<";
-	
-	dev->write(header, sizeof(header));
-	
-	dev->write((char *)data_length, sizeof(data_length));
+	dev->writeStr("$M<");
+
+	char length_str[sizeof(std::string)];
+	sprintf(length_str, "%x", data_length);
+	dev->writeStr(length_str);
 	checksum ^= data_length;
 
-	dev->write((char *)code, sizeof(code));
-	checksum ^= code;
+	char opcode_str[sizeof(std::string)];
+	sprintf(opcode_str, "%x", opcode);
+	dev->writeStr(opcode_str);
+	checksum ^= opcode;
 
 	for (int i = 0; i < data_length; i++)
 	{
-		dev->write((char *)data[i], sizeof(data[i]));
-		checksum ^= (char *)data[i];
+		char data_str[sizeof(std::string)];
+		sprintf(data_str, "%x", data[i]);
+		dev->writeStr(data_str);
+		checksum ^= data[i];
 	}
 
-	dev->write((char *) checksum, sizeof(checksum));
+	char checksum_str[sizeof(std::string)];
+	sprintf(checksum_str, "%x", checksum);
+
+	dev->writeStr(checksum_str);
 }
