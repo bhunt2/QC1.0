@@ -1,29 +1,30 @@
-void send_cmd(uint8_t opcode, uint8_t* data, uint8_t data_length)
-{
-	uint8_t checksum = 0;
 
-	dev->writeStr("$M<");
-
-	char length_str[sizeof(std::string)];
-	sprintf(length_str, "%x", data_length);
-	dev->writeStr(length_str);
-	checksum ^= data_length;
-
-	char opcode_str[sizeof(std::string)];
-	sprintf(opcode_str, "%x", opcode);
-	dev->writeStr(opcode_str);
-	checksum ^= opcode;
-
-	for (int i = 0; i < data_length; i++)
-	{
-		char data_str[sizeof(std::string)];
-		sprintf(data_str, "%x", data[i]);
-		dev->writeStr(data_str);
-		checksum ^= data[i];
+	try {
+		dev = new mraa::Uart(0);
+	} catch (std::exception& e) {
+		std::cout << e.what() << ", likely invalid platform config" << std::endl;
 	}
 
-	char checksum_str[sizeof(std::string)];
-	sprintf(checksum_str, "%x", checksum);
+	std::string dev_path = dev->getDevicePath();
 
-	dev->writeStr(checksum_str);
-}
+	std::cout << "dev path: " << dev_path << std::endl;
+
+	/*
+	try {
+		//dev = new mraa::Uart("/dev/ttyACM0");
+		dev = new mraa:: Uart(dev_path);
+	} catch (std::exception& e) {
+		std::cout << "Error while setting up raw UART, do you have a uart?" << std::endl;
+		std::terminate();
+	}
+	 */
+
+	if (dev->setBaudRate(115200) != mraa::SUCCESS) {
+		std::cout << "Error setting parity on UART" << std::endl;
+	}
+	if (dev->setMode(8, mraa::UART_PARITY_NONE, 1) != mraa::SUCCESS) {
+		std::cout << "Error setting parity on UART" << std::endl;
+	}
+	if (dev->setFlowcontrol(false, false) != mraa::SUCCESS) {
+		std::cout << "Error setting flow control UART" << std::endl;
+	}
