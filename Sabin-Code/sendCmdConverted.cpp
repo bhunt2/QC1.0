@@ -21,7 +21,7 @@ int main()
 {
 	setup();
 
-	get_data(100);
+	get_data(108);
 
 	return EXIT_SUCCESS;
 }
@@ -54,16 +54,26 @@ void send_cmd(uint8_t opcode, uint8_t* data, uint8_t data_length)
 	sprintf(checksum_str, "%x", checksum);
 
 	dev->writeStr(checksum_str);
+	dev->flush();
 }
 
 
 void get_data(uint8_t cmd)
 {
 	send_cmd(cmd, 0, 0);
-
-	if(dev->dataAvailable())
+	usleep(1000);
+	
+	while(1)
 	{
-		std::cout << dev->readStr(0) << std::endl;
+		if(dev->dataAvailable())
+		{
+			//char* buff = 0;
+			//dev->read(buff, 3);
+		
+			std::cout << "Data Response: " << dev->readStr(20) << "\n" << std::endl;
+		} /*else{
+			std::cout << "Not Serial Data Available.\n" << std::endl;
+		}*/
 	}
 }
 
@@ -109,4 +119,5 @@ std::string binary(uint8_t value)
 
 	return binary_value;
 }
+
 
