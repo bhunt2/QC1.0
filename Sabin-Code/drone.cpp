@@ -7,7 +7,13 @@
 
 /* FUNCTION DECLARATION */
 
-void get_data(uint8_t, uint8_t);
+void get_response_without_parameters(uint8_t);
+
+void get_response_with_parameters(uint8_t, uint8_t, uint8_t*);
+
+void evaluate_msp_ident(std::string);
+
+void evaluate_msp_attitude(std::string);
 
 void read(uint8_t);
 
@@ -55,12 +61,12 @@ struct uart_setup
 		xon_xoff(false),
 		rts_cts(false)
 		{}
-};
+} uartsetup;
 
 struct msp_ident{
-	uint8_t version; // version of MultiWii
-	uint8_t multitype; // type of multi: TRI/QUADP,QUADX,BI,GIMBAL,Y6,HEX6,FLYING_WING,Y4,HEX6X,OCTOX8, OCTOFLATP,OCTOFLATX,AIRPLANE,HELI_120,HELI_90,VTAIL4,HEX6H,SINGLECOPTER,DUALCOPTER
-	uint32_t capability; // A 32 bit variable to indicate capability of FC board. (Currently, BIND button is used on first bit, DYNBAL on second, FLAP on third )
+	const uint8_t* version; // version of MultiWii
+	const uint8_t* multitype; // type of multi: TRI/QUADP,QUADX,BI,GIMBAL,Y6,HEX6,FLYING_WING,Y4,HEX6X,OCTOX8, OCTOFLATP,OCTOFLATX,AIRPLANE,HELI_120,HELI_90,VTAIL4,HEX6H,SINGLECOPTER,DUALCOPTER
+	const uint32_t* capability; // A 32 bit variable to indicate capability of FC board. (Currently, BIND button is used on first bit, DYNBAL on second, FLAP on third )
 } ident;
 
 struct msp_attitude
@@ -75,7 +81,7 @@ int main(int argc, char* argv[]){
 
 	get_response_without_parameters(MSP_IDENT);
 
-	std::cout << "version: " << att.version  << "multitype: " << att.multitype << std::endl;
+	std::cout << "version: " << ident.version  << "multitype: " << ident.multitype << std::endl;
 
 	return EXIT_SUCCESS;
 }
@@ -90,9 +96,9 @@ void get_response_without_parameters(uint8_t opcode){
 
 }
 
-void get_response_without_parameters(uint8_t opcode, uint8_t param_length, uint8_t* params){
+void get_response_with_parameters(uint8_t opcode, uint8_t param_length, uint8_t* params){
 
-	msp_command(opcode, param_length, param);
+	msp_command(opcode, param_length, params);
 
 	usleep(500);
 
@@ -113,9 +119,12 @@ void read(uint8_t opcode) {
 		}
 	}
 
-	std::uint8_t datalength = reinterpret_cast<const uint8_t*>(&dev->readStr(1));
-	std::uint8_t code = reinterpret_cast<const uint8_t*>(&dev->readStr(1));
-	std::string data = dev->readStr(datalength);
+	std::string l = dev->readStr(1);
+	std::string c = dev->readStr(1);
+	
+	const uint8_t *datalength = reinterpret_cast<const uint8_t*>(&l);
+	const uint8_t *code = reinterpret_cast<const uint8_t*>(&c);
+	std::string data = dev->readStr((int)datalength);
 
 	switch (opcode) {
 		case MSP_IDENT:
@@ -129,17 +138,17 @@ void read(uint8_t opcode) {
 
 void evaluate_msp_ident(std::string data){
 
-	ident.version = reinterpret_cast<const uint16_t*>(&data[0]);
-	ident.multitype = reinterpret_cast<const uint16_t*>(&data[1]);
+	ident.version = reinterpret_cast<const uint8_t*>(&data[0]);
+	ident.multitype = reinterpret_cast<const uint8_t*>(&data[1]);
 	ident.capability = reinterpret_cast<const uint32_t*>(&data[2]);
 
 }
 
 void evaluate_msp_attitude(std::string data){
 
-	att.ang_x = atoi(data[0]);
-	att.ang_y = atoi(data[1]) ;
-	att.heading = atoi(data[2]);
+	att.ang_x = atoi(&data[0]);
+	att.ang_y = atoi(&data[1]) ;
+	att.heading = atoi(&data[2]);
 
 }
 
@@ -186,7 +195,7 @@ void msp_command(uint8_t opcode, uint8_t paramenter_size, uint8_t* parameters){
 
 	// Send the data bytes
 	for(int i = 0; i < paramenter_size/sizeof(uint8_t); i++) {
-		const char* data = reinterpret_cast<const char*>(&parameters[i])
+		const char* data = reinterpret_cast<const char*>(&parameters[i]);
 		dev->writeStr(data);
 		checksum ^= parameters[i];
 	}
@@ -208,25 +217,25 @@ void setup(){
 		std::cout << e.what() << ", likely invalid platform config" << std::endl;
 	}
 
-	if (dev->setBaudRate(uart_setup.baudrate) != mraa::SUCCESS) {
+	if (dev->setBaudRate(uartsetup.baudrate) != mraa::SUCCESS) {
 		std::cout << "Error setting parity on UART" << std::endl;
 	}
 	else{
-		std::cout << "Setting Baudrate to " << uart_setup.baudrate << "..." << std::endl;
+		std::cout << "Setting Baudrate to " << uartsetup.baudrate << "..." << std::endl;
 	}
 
-	if (dev->setMode(uart_setup.mode_byte_size, uart_setup.mode_parity, uart_setup.mode_stop_bits) != mraa::SUCCESS) {
+	if (dev->setMode(uartsetup.mode_byte_size, uartsetup.mode_parity, uartsetup.mode_stop_bits) != mraa::SUCCESS) {
 		std::cout << "Error setting parity on UART" << std::endl;
 	}
 	else{
-		std::cout << "Setting Mode to " << uart_setup.mode_byte_size << uart_setup.mode_parity << uart_setup.mode_stop_bits << "..." << std::endl;
+		std::cout << "Setting Mode to " << uartsetup.mode_byte_size << uartsetup.mode_parity << uartsetup.mode_stop_bits << "..." << std::endl;
 	}
 
-	if (dev->setFlowcontrol(uart_setup.xon_xoff, uart_setup.rts_cts) != mraa::SUCCESS) {
+	if (dev->setFlowcontrol(uartsetup.xon_xoff, uartsetup.rts_cts) != mraa::SUCCESS) {
 		std::cout << "Error setting flow control UART" << std::endl;
 	}
 	else{
-		std::cout << "Setting Flow Control: xonxoff->" << uart_setup.xon_xoff << " rtscts->" << uart_setup.rts_cts << "..." << std::endl;
+		std::cout << "Setting Flow Control: xonxoff->" << uartsetup.xon_xoff << " rtscts->" << uartsetup.rts_cts << "..." << std::endl;
 	}
 
 	std::cout << "Device Path: " << dev->getDevicePath() << std::endl;
