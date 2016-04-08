@@ -219,20 +219,3 @@ int main( int argc, const char** argv )
 
     return 0;
 }
-
-//	int frame_width = vcap.get(CV_CAP_PROP_FRAME_WIDTH);
-//	int frame_height = vcap.get(CV_CAP_PROP_FRAME_HEIGHT);
-
-//  VideoWriter video("output.avi", CV_FOURCC('M', 'J', 'P', 'G'), 4, Size(frame_width, frame_height), true);
-//
-//		for (;;) {
-//
-//			Mat frame;
-//			vcap >> frame;
-//			//video.write(frame);
-//			detectAndDisplay(frame);
-//			video.write(frame);
-//			imshow("Frame", frame);
-//			char c = (char)waitKey(33);
-//			if (c == 27) break;
-//		}
