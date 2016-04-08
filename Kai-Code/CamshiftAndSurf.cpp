@@ -23,6 +23,7 @@ Point origin;
 Rect selection;
 int vmin = 10, vmax = 256, smin = 30;
 
+// function for detecting the mouses action and creating the bounding box
 static void onMouse( int event, int x, int y, int, void* )
 {
     if( selectObject )
@@ -50,6 +51,7 @@ static void onMouse( int event, int x, int y, int, void* )
     }
 }
 
+//hot keys for adjusting different modes. This will be removed for the final product
 string hot_keys =
     "\n\nHot keys: \n"
     "\tESC - quit the program\n"
@@ -59,6 +61,7 @@ string hot_keys =
     "\tp - pause video\n"
     "To initialize tracking, select the object with mouse\n";
 
+// Just a help function. Will be removed for final code
 static void help()
 {
     cout << "\nThis is a demo that shows mean-shift based tracking\n"
@@ -239,20 +242,3 @@ int main( int argc, const char** argv )
 
     return 0;
 }
-
-//	int frame_width = vcap.get(CV_CAP_PROP_FRAME_WIDTH);
-//	int frame_height = vcap.get(CV_CAP_PROP_FRAME_HEIGHT);
-
-//  VideoWriter video("output.avi", CV_FOURCC('M', 'J', 'P', 'G'), 4, Size(frame_width, frame_height), true);
-//
-//		for (;;) {
-//
-//			Mat frame;
-//			vcap >> frame;
-//			//video.write(frame);
-//			detectAndDisplay(frame);
-//			video.write(frame);
-//			imshow("Frame", frame);
-//			char c = (char)waitKey(33);
-//			if (c == 27) break;
-//		}
