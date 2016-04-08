@@ -1,4 +1,5 @@
-// Code for capturing video from webcam and outputting that video (need to integrate object tracking and such into this)
+// Code for capturing video from webcam and outputting that video. Some image processing will also be displayed for the purpose
+// of showing that the captured video is capturing everything.
 
 #include "opencv2/opencv.hpp"
 #include <iostream>
@@ -28,6 +29,7 @@ int main() {
 	//-- 1. Load the cascades
 	if (!face_cascade.load(face_cascade_name)) { printf("--(!)Error loading face cascade\n"); return -1; };
 	if (!eyes_cascade.load(eyes_cascade_name)) { printf("--(!)Error loading eyes cascade\n"); return -1; };
+	// Begins writing image captures to video
 	VideoCapture vcap(0);
 	if (!vcap.isOpened()) {
 		cout << "Error opening video stream or file" << endl;
@@ -87,6 +89,4 @@ void detectAndDisplay(Mat frame)
 			circle(frame, eye_center, radius, Scalar(255, 0, 0), 4, 8, 0);
 		}
 	}
-	//-- Show what you got
-	//imshow(window_name, frame);
 }
