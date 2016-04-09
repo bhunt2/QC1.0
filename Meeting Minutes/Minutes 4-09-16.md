@@ -21,7 +21,7 @@
 ###Hau
 1. Solder broken USB port on Flip MWC 1.5 Flight Controller
 2. Measure and remake drone arm tube 
-3. Fix the GPS mount
+3. Short pin 1 and 2 on Micro USB on OTG
   
 
 ###Sabin
