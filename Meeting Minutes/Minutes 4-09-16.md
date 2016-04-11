@@ -34,3 +34,4 @@
 1. Camera and Edison Integration
 2. Undistorted Camera Integration
 3. Integrate imanage processing code into Edison environment 
+4. Determine distance of Object from camera in image

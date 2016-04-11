@@ -27,8 +27,8 @@ int main(int argc, char* argv[])
 	}*/
 
 	setup();
-	//get_data(108, 48);
-	get_data(108,0);//send_msp(100,0,0);
+	get_data(108, 0);
+	//get_data(108,0);//send_msp(100,0,0);
 	//get_data((uint8_t)argv[0], (uint8_t)argv[1]);
 
 	return EXIT_SUCCESS;
@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
 
 void send_cmd(uint8_t opcode, uint8_t* data, uint8_t data_length)
 {
-/*
+
 	uint8_t checksum = 0;
 
 	dev->writeStr("$M<");
@@ -65,7 +65,7 @@ void send_cmd(uint8_t opcode, uint8_t* data, uint8_t data_length)
 
 	dev->writeStr(checksum_str);
 	dev->flush();
-*/
+
 }
 
 void send_msp(uint8_t opcode, uint8_t * data, uint8_t n_bytes) {
@@ -99,8 +99,10 @@ void send_msp(uint8_t opcode, uint8_t * data, uint8_t n_bytes) {
 
 void get_data(uint8_t cmd, uint8_t data_length)
 {
-	//send_cmd(cmd, 0, data_length);
-	send_msp(cmd,0,data_length);
+	printf ("Sending Command: %d \n", cmd);
+
+	send_cmd(cmd, 0, data_length);
+	//send_msp(cmd,0,data_length);
 	usleep(1000);
 
 	while(1)
@@ -110,7 +112,7 @@ void get_data(uint8_t cmd, uint8_t data_length)
 			//char* buff;
 			//dev->read(buff, 3);
 		
-			std::cout << "Data Response: " << dev->readStr(1) << "\n" << std::endl;
+			std::cout << "Data Response: " << dev->readStr(20) << "\n" << std::endl;
 		} /*else{
 			std::cout << "Not Serial Data Available.\n" << std::endl;
 		}*/
@@ -120,6 +122,23 @@ void get_data(uint8_t cmd, uint8_t data_length)
 
 void setup()
 {
+
+	mraa::Gpio* gpio_rx = new mraa::Gpio(mraa::INTEL_EDISON_GP130);
+
+	mraa::Gpio* gpio_tx = new mraa::Gpio(mraa::INTEL_EDISON_GP131);
+
+	gpio_rx->dir(mraa::DIR_IN); gpio_rx->mode(mraa::MODE_STRONG);
+
+	gpio_tx->dir(mraa::DIR_OUT); gpio_tx->mode(mraa::MODE_STRONG);
+
+
+	/*
+    if (response != mraa::SUCCESS) {
+        mraa::printError(response);
+        return 1;
+    }
+    */
+
 	try {
 		std::cout << "Initializing UART..." << std::endl;
 		dev = new mraa::Uart(0);
@@ -138,7 +157,7 @@ void setup()
 	}
 	 */
 
-	int baudrate = 9600;//115200
+	int baudrate = 115200; // 9600;//115200
 
 	if (dev->setBaudRate(baudrate ) != mraa::SUCCESS) {
 		std::cout << "Error setting parity on UART" << std::endl;
