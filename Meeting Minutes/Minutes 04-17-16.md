@@ -9,7 +9,7 @@
 - Intergration of Camera on Edison
 - Serial Comunication with Edison
 
-##Announcements
+##Issue
 
 ###- Power problems with Edison while connecting camera
 ###- Having problems communicating with Edison on current ports on Flip 1.5
