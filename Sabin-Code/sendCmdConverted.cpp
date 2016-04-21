@@ -21,51 +21,14 @@ mraa::Uart* dev;
 
 int main(int argc, char* argv[])
 {
-	/*if(argc < 2){
-		std:: cerr << "Usage: " << argv[0] << "COMMAND" << std::endl;
-		return 1;
-	}*/
-
+	uint8_t cmd_ident = 100;
+	uint8_t cmd_att = 108;
+	
 	setup();
-	get_data(108, 0);
-	//get_data(108,0);//send_msp(100,0,0);
-	//get_data((uint8_t)argv[0], (uint8_t)argv[1]);
+	
+	get_data(cmd_ident, 0);
 
 	return EXIT_SUCCESS;
-}
-
-
-void send_cmd(uint8_t opcode, uint8_t* data, uint8_t data_length)
-{
-
-	uint8_t checksum = 0;
-
-	dev->writeStr("$M<");
-
-	char length_str[sizeof(std::string)];
-	sprintf(length_str, "%x", data_length);
-	dev->writeStr(length_str);
-	checksum ^= data_length;
-
-	char opcode_str[sizeof(std::string)];
-	sprintf(opcode_str, "%x", opcode);
-	dev->writeStr(opcode_str);
-	checksum ^= opcode;
-
-	//for (int i = 0; i < data_length; i++)
-	//{
-	//	char data_str[sizeof(std::string)];
-	//	sprintf(data_str, "%x", data[i]);
-	//	dev->writeStr(data_str);
-	//	checksum ^= data[i];
-	//}
-
-	char checksum_str[sizeof(std::string)];
-	sprintf(checksum_str, "%x", checksum);
-
-	dev->writeStr(checksum_str);
-	dev->flush();
-
 }
 
 void send_msp(uint8_t opcode, uint8_t * data, uint8_t n_bytes) {
@@ -102,7 +65,7 @@ void get_data(uint8_t cmd, uint8_t data_length)
 	printf ("Sending Command: %d \n", cmd);
 
 	send_cmd(cmd, 0, data_length);
-	//send_msp(cmd,0,data_length);
+
 	usleep(1000);
 
 	while(1)
@@ -123,22 +86,6 @@ void get_data(uint8_t cmd, uint8_t data_length)
 void setup()
 {
 
-	mraa::Gpio* gpio_rx = new mraa::Gpio(mraa::INTEL_EDISON_GP130);
-
-	mraa::Gpio* gpio_tx = new mraa::Gpio(mraa::INTEL_EDISON_GP131);
-
-	gpio_rx->dir(mraa::DIR_IN); gpio_rx->mode(mraa::MODE_STRONG);
-
-	gpio_tx->dir(mraa::DIR_OUT); gpio_tx->mode(mraa::MODE_STRONG);
-
-
-	/*
-    if (response != mraa::SUCCESS) {
-        mraa::printError(response);
-        return 1;
-    }
-    */
-
 	try {
 		std::cout << "Initializing UART..." << std::endl;
 		dev = new mraa::Uart(0);
@@ -146,16 +93,6 @@ void setup()
 	} catch (std::exception& e) {
 		std::cout << e.what() << ", likely invalid platform config" << std::endl;
 	}
-
-	/*
-	try {
-		//dev = new mraa::Uart("/dev/ttyMFD1");
-		//dev = new mraa:: Uart(dev_path);
-	} catch (std::exception& e) {
-		std::cout << "Error while setting up raw UART, do you have a uart?" << std::endl;
-		std::terminate();
-	}
-	 */
 
 	int baudrate = 115200; // 9600;//115200
 
@@ -178,15 +115,6 @@ void setup()
 	}
 
 	std::cout << "Device Path: " << dev->getDevicePath() << std::endl;
-}
-
-std::string binary(uint8_t value)
-{
-	std::bitset<8> x(value);
-	x.set();
-	std::string binary_value = x.to_string<char,std::string::traits_type,std::string::allocator_type>();
-
-	return binary_value;
 }
 
 
