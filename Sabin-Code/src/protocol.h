@@ -28,15 +28,15 @@ private:
 			{}
 	} uartsetup;
 
-	// Setup the UART with 
-	void setup_uart(int);
+	// Setup the UART 
+	void setup_uart();
 
 	void msp_request(uint8_t);
 
 	void msp_command(uint8_t, uint8_t, uint8_t*);
 
 public:
-	protocol(mraa::Uart*);
+	protocol();
 
 	~protocol();
 
