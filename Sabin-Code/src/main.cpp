@@ -37,31 +37,7 @@ const char* from_fc_header = "$M>";
 
 mraa::Uart* dev;
 
-/* MULTIWII SERIAL PROTOCOL COMMANDS */
-enum MSP_COMMANDS
-{
-	MSP_IDENT = 100,
-	MSP_ATTITUDE = 108
-};
 
-struct uart_setup
-{
-	unsigned int baudrate;
-	int mode_byte_size;
-	mraa::UartParity mode_parity;
-	int mode_stop_bits;
-	bool xon_xoff;
-	bool rts_cts;
-
-	uart_setup() :
-		baudrate(115200),
-		mode_byte_size(8),
-		mode_parity(mraa::UART_PARITY_NONE),
-		mode_stop_bits(1),
-		xon_xoff(false),
-		rts_cts(false)
-		{}
-} uartsetup;
 
 struct msp_ident{
 	const uint8_t* version; // version of MultiWii
