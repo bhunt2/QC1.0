@@ -1,3 +1,4 @@
+#include <string>
 
 #include "mraa.hpp"
 
@@ -44,5 +45,5 @@ public:
 
 	void get_response_with_parameters(uint8_t, uint8_t, uint8_t*);
 
-	void read(uint8_t);
+	std::string read();
 };
