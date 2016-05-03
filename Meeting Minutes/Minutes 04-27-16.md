@@ -3,23 +3,25 @@
 - Hau
 - Sabin
 - Kainoa
+- Ben
+- James
+- Mark
 
 ##Topics
 
 - Standup meeting
+- Periodic Capstone review.
 
-##Issue
-1. The inner diameter of the replacement arm tube is smaller than the old one. The bracket that goes inside doesn't fit
+##Announment
+1. Mark requested project schedule, test plan, model. 
 
 ##Tasks update
 
 ###Hau
-1. Got the flip ready with headers soldered
-2. Made a temp solution for powering edision using 9V batter and connectors. 
+1. Carbon tube with 15.7mm x 14.7mm diameter is not available. A work-around would be filing the brackets and inner tube. 
 
 ###Sabin
-1. C++ code works
+1. Python code works. 
 
 ###Kainoa
-1. Frame per second code works, but it outputs constant FPS. The test is for webcam.
-
+1. Camera resolution is 1920, but it only outputs 640 on computer. Change the code to fit resolution of 640. That reduces error by a factor of 3.
