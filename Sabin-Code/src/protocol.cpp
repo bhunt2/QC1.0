@@ -48,15 +48,18 @@ void protocol::uart_setup(){
 }
 
 void protocol::msp_request(uint8_t opcode){
+
 	std::ostringstream buf;
+
 	uint8_t length = 0;
+
 	uint8_t checksum = 0;
 
     // Calculate checksum
     checksum = checksum ^ length ^ cmd_att;
 	
 	// Pack frame
-	buf << "$M<" << (char)length << (char)cmd_att << (char)checksum;
+	buf << to_fc_header << (char)length << (char)cmd_att << (char)checksum;
 	
 	// Convert buffer into a string
 	std::string frame_string = buf.str();
@@ -96,8 +99,29 @@ void protocol::msp_request(uint8_t opcode){
 	}	
 }
 
-void protocol::msp_command(uint8_t opcode, uint8_t param_length, uint8_t* params){
+void protocol::msp_command(uint8_t opcode, uint8_t param_size, uint8_t* params){
 
+	std::ostringstream buf;
+
+	uint8_t checksum = 0;
+
+    // Calculate checksum
+    checksum = checksum ^ param_size ^ opcode;
+	
+	// Pack frame
+	buf << to_fc_header << (char)param_size << (char)opcode;
+	
+	for (int i = 0; i <= params; i++)
+	{
+		
+	}
+
+	// Convert buffer into a string
+	std::string frame_string = buf.str();
+	
+	// Send packed frame
+    dev->writeStr(frame_string);
+	
 }
 
 std::string protocol::read(){
