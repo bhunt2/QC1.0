@@ -1,4 +1,6 @@
-#include <string>
+
+#ifndef PARSERS_H
+#define PARSERS_H
 
 #include "msp_frames.h"
 
@@ -9,17 +11,25 @@ class parsers
 		
 		
 	public:
-		parsers();
+		//parsers();
 		
-		~parsers();
+		//~parsers();
 
-		msp_attitude evaluate_attitude(std::string);
+		attitude_frame evaluate_attitude(std::string);
 
-		void evaluate_altitude();
+		void evaluate_altitude(std::string);
 
-		void evaluate_identification();
+		void evaluate_identification(std::string);
 
-		void evaluate_raw_rc();
+		void evaluate_raw_rc(std::string);
 
 };
+
+#endif
+
+
+
+
+
+
 

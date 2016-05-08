@@ -2,10 +2,16 @@
 
 #include "mraa.hpp"
 
+#ifndef PROTOCOL_H
+#define PROTOCOL_H
+
+
 class protocol
 {
 
 private:
+	bool DEBUG;
+
 	// UART Device object
 	mraa::Uart* device;
 
@@ -51,3 +57,7 @@ public:
 	void set_data(uint8_t, uint8_t, uint8_t*);
 	 
 };
+
+#endif
+
+

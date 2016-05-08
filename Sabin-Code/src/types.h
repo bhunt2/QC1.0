@@ -1,14 +1,18 @@
 
+#ifndef TYPES_H
+#define TYPES_H
 
-uint8_t msp_ident = 100;
+extern uint8_t msp_ident;
 
-uint8_t msp_attitude = 108;
+extern uint8_t msp_attitude;
 
-uint8_t msp_altitude = 109;
+extern uint8_t msp_altitude;
 
-uint8_t msp_set_raw_rc = 200;
+extern uint8_t msp_set_raw_rc;
 
-const char* to_fc_header = "$M<";
+extern const char* to_fc_header;
 
-const char* from_fc_header = "$M>";
+extern const char* from_fc_header;
+
+#endif
 

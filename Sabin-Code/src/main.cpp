@@ -2,9 +2,11 @@
 #include <iostream>
 #include <exception>
 
-#include "protocol.h"
+#include "msp_frames.h"
 #include "types.h"
 #include "parsers.h"
+#include "protocol.h"
+
 
 int main(int argc, char* argv[]){
 	
@@ -12,13 +14,13 @@ int main(int argc, char* argv[]){
 
 	parsers parse;
 
-	std::string response = msp_protocol.request(msp_attitude);
+	std::string response = msp_protocol.request_data(msp_attitude);
 
-	msp_attitude att = parse.evaluate_attitude(response);
+	attitude_frame att;
 
-	cout << "angx: " << msp_attitude.ang_x;
-	cout << "angy: " << msp_attitude.ang_y;
-	cout << "heading: " << msp_attitude.heading;
+	att = parse.evaluate_attitude(response);
+
+	std::cout << "angx: " << att.ang_x << "\tangy: " << att.ang_y << "\theading: " << att.heading << std::endl;
 
 	return 0;
 	

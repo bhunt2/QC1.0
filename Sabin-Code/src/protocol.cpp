@@ -1,20 +1,21 @@
 
 #include <exception>
 #include <iostream>
-#include <string>
+#include <sstream>
 
 #include "protocol.h"
+
 #include "types.h"
 
 protocol::protocol(){
-	uart_setup();
+	setup_uart();
 }
 
 protocol::~protocol(){
 	delete device;
 }
 
-void protocol::uart_setup(){
+void protocol::setup_uart(){
 	try {
 		std::cout << "Initializing UART..." << std::endl;
 		device = new mraa::Uart(0);
@@ -56,18 +57,18 @@ void protocol::msp_request(uint8_t opcode){
 	uint8_t checksum = 0;
 
     // Calculate checksum
-    checksum = checksum ^ length ^ cmd_att;
+    checksum = checksum ^ length ^ opcode;
 	
 	// Pack frame
-	buf << to_fc_header << (char)length << (char)cmd_att << (char)checksum;
+	buf << to_fc_header << (char)length << (char)opcode << (char)checksum;
 	
 	// Convert buffer into a string
 	std::string frame_string = buf.str();
 	
 	// Send packed frame
-    dev->writeStr(frame_string);
+    device->writeStr(frame_string);
 	
-	if(DEBUG == 1)
+	/*if(DEBUG == 1)
 	{
 		std::cout << "\n\n\t\t" << "Header\t     Size\t      Command\t       CRC\n";
 		std::cout << "Sending Frame:\t";
@@ -96,7 +97,7 @@ void protocol::msp_request(uint8_t opcode){
 			ctr++;
 		}
 		std::cout << "\n\n\n";
-	}	
+	}*/
 }
 
 void protocol::msp_command(uint8_t opcode, uint8_t data_length, uint8_t* params){
@@ -114,7 +115,7 @@ void protocol::msp_command(uint8_t opcode, uint8_t data_length, uint8_t* params)
 	// Pack the data parameters
 	for (int i = 0; i <= data_length; i++)
 	{
-		buff << (char)params[i];
+		buf << (char)params[i];
 
 		checksum = checksum ^ params[i];
 	}
@@ -126,7 +127,7 @@ void protocol::msp_command(uint8_t opcode, uint8_t data_length, uint8_t* params)
 	std::string frame_string = buf.str();
 	
 	// Send packed frame
-    dev->writeStr(frame_string);
+    device->writeStr(frame_string);
 	
 }
 
@@ -140,10 +141,10 @@ std::string protocol::read(){
 	// Do once, then continue unless time has run out 
 	do
 	{
-		if(dev->dataAvailable())
+		if(device->dataAvailable())
 		{
 			// Get known frame size back for now
-			buf.append(dev->readStr(1));
+			buf.append(device->readStr(1));
 			
 			if(DEBUG == 1)
 			{
@@ -188,7 +189,7 @@ std::string protocol::request_data(uint8_t opcode){
 
 	usleep(500);
 
-	return read(opcode);
+	return read();
 
 }
 
@@ -200,13 +201,13 @@ std::string protocol::request_data(uint8_t opcode, uint8_t param_length, uint8_t
 
 	usleep(500);
 
-	return read(opcode);
+	return read();
 
 }
 
-void protocol::set_data(uint8_t opcode){
+void protocol::set_data(uint8_t opcode, uint8_t param_length, uint8_t* params){
 
 	std::cout << "Sending Command: " << opcode << std::endl;
 
-	msp_request(opcode);
+	msp_command(opcode, param_length, params);
 }
