@@ -99,22 +99,28 @@ void protocol::msp_request(uint8_t opcode){
 	}	
 }
 
-void protocol::msp_command(uint8_t opcode, uint8_t param_size, uint8_t* params){
+void protocol::msp_command(uint8_t opcode, uint8_t data_length, uint8_t* params){
 
 	std::ostringstream buf;
 
 	uint8_t checksum = 0;
 
     // Calculate checksum
-    checksum = checksum ^ param_size ^ opcode;
+    checksum = checksum ^ data_length ^ opcode;
 	
 	// Pack frame
-	buf << to_fc_header << (char)param_size << (char)opcode;
+	buf << to_fc_header << (char)data_length << (char)opcode;
 	
-	for (int i = 0; i <= params; i++)
+	// Pack the data parameters
+	for (int i = 0; i <= data_length; i++)
 	{
-		
+		buff << (char)params[i];
+
+		checksum = checksum ^ params[i];
 	}
+
+	// Append the checksum
+	buf << (char)checksum;
 
 	// Convert buffer into a string
 	std::string frame_string = buf.str();
@@ -174,7 +180,7 @@ std::string protocol::read(){
 	return buf;
 }
 
-void protocol::get_response_without_parameters(uint8_t opcode){
+std::string protocol::request_data(uint8_t opcode){
 
 	std::cout << "Sending Command: " << opcode << std::endl;
 
@@ -182,11 +188,11 @@ void protocol::get_response_without_parameters(uint8_t opcode){
 
 	usleep(500);
 
-	read(opcode);
+	return read(opcode);
 
 }
 
-void protocol::get_response_with_parameters(uint8_t opcode, uint8_t param_length, uint8_t* params){
+std::string protocol::request_data(uint8_t opcode, uint8_t param_length, uint8_t* params){
 
 	std::cout << "Sending Command: " << opcode << std::endl;
 
@@ -194,6 +200,13 @@ void protocol::get_response_with_parameters(uint8_t opcode, uint8_t param_length
 
 	usleep(500);
 
-	read(opcode);
+	return read(opcode);
 
+}
+
+void protocol::set_data(uint8_t opcode){
+
+	std::cout << "Sending Command: " << opcode << std::endl;
+
+	msp_request(opcode);
 }

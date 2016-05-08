@@ -6,17 +6,14 @@ class parsers
 {
 	
 	private:
-		msp_ident identification;
-		msp_attitude attitude;
-		msp_altitude altitude;
-		msp_set_raw_rc raw_rc;
+		
 		
 	public:
 		parsers();
 		
 		~parsers();
 
-		void evaluate_attitude();
+		msp_attitude evaluate_attitude(std::string);
 
 		void evaluate_altitude();
 

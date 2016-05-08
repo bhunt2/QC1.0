@@ -36,14 +36,18 @@ private:
 
 	void msp_command(uint8_t, uint8_t, uint8_t*);
 
+	std::string read();
+
+
 public:
 	protocol();
 
 	~protocol();
 
-	void get_response_without_parameters(uint8_t);
+	std::string request_data(uint8_t);
 
-	void get_response_with_parameters(uint8_t, uint8_t, uint8_t*);
+	std::string request_data(uint8_t, uint8_t, uint8_t*);
 
-	std::string read();
+	void set_data(uint8_t, uint8_t, uint8_t*);
+	 
 };
