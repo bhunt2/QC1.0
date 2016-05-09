@@ -21,10 +21,10 @@ struct altitude_frame {
 };
 
 struct set_raw_rc_frame {
-	uint16_t roll;
-	uint16_t pitch;
-	uint16_t yaw;
-	uint16_t throttle;
+	uint16_t roll; // 16 bit Range [1000;2000]
+	uint16_t pitch; // 16 bit Range [1000;2000]
+	uint16_t yaw; // 16 bit Range [1000;2000]
+	uint16_t throttle; // 16 bit Range [1000;2000]
 };
 
 #endif

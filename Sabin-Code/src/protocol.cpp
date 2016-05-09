@@ -233,6 +233,8 @@ std::string protocol::read(){
 	return buf;
 }
 
+// Only takes in command code
+// and reads the response back
 std::string protocol::request_data(uint8_t opcode){
 
 	std::cout << "Sending Command: " << opcode << std::endl;
@@ -245,6 +247,8 @@ std::string protocol::request_data(uint8_t opcode){
 
 }
 
+// Sends the parameter to the Flight controller w/ command code
+// and reads the response back
 std::string protocol::request_data(uint8_t opcode, uint8_t param_length, int* params){
 
 	std::cout << "Sending Command: " << opcode << std::endl;
@@ -257,6 +261,8 @@ std::string protocol::request_data(uint8_t opcode, uint8_t param_length, int* pa
 
 }
 
+// Just send the command w/parameters to set
+// Does not return any responses.
 void protocol::set_data(uint8_t opcode, uint8_t param_length, int* params){
 
 	std::cout << "Sending Command: " << opcode << std::endl;

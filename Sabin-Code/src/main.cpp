@@ -36,6 +36,7 @@ int main(int argc, char* argv[]){
 	if (strcmp(argv[1], "108") == 0)
 	{
 		std::string response = msp_protocol.request_data(msp_attitude);
+		std::cout << "Data Response: " << response << std::endl;
 
 		attitude_frame att;
 
@@ -53,11 +54,12 @@ int main(int argc, char* argv[]){
 
 		std::string response = msp_protocol.request_data(msp_read_rc);
 		std::cout << "Data Response: " << response << std::endl;
+
 		set_raw_rc_frame rc;
 
 		rc = parse.evaluate_raw_rc(response);
 
-		printf("yaw: %d\t pitch: %d\t roll: %d\t throttle: %d\n", rc.yaw, rc.pitch, rc.roll, rc.throttle);
+		printf("roll: %u\t pitch: %u\t yaw: %u\t throttle: %u\n", rc.roll, rc.pitch, rc.yaw, rc.throttle);
 
 		return 0;
 	}
