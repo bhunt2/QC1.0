@@ -10,29 +10,81 @@
 
 
 int main(int argc, char* argv[]){
-	
-	protocol msp_protocol;
+
+	unsigned int microseconds = 1000000;
+
+	if (argc <= 1)
+	{
+		std::cout << "Argument must be provided." << std::endl;
+		std::cout << "Example: ./drone [msp command number]\n" << std::endl;
+		return 0;
+	}
+
+	if (argc > 2)
+	{
+		std::cout << "Only 1 argument is expected." << std::endl;
+		std::cout << "Example: ./drone [msp command number]\n" << std::endl;
+		return 0;
+	}
+
+
+	protocol msp_protocol(1);
 
 	parsers parse;
 
-	//uint8_t length = 4;
-	//int data[length] = {1500, 1500, 2000, 1000};
-	//uint8_t msp_rc_read_cmd = 105;
-	//std::string response = msp_protocol.request_data(msp_rc_read_cmd);
+	// Read Attitude
+	if (strcmp(argv[1], "108") == 0)
+	{
+		std::string response = msp_protocol.request_data(msp_attitude);
 
-	//set_raw_rc_frame rc;
+		attitude_frame att;
 
-	//rc = parse.evaluate_raw_rc(response);
+		att = parse.evaluate_attitude(response);
 
-	//printf("yaw: %d\t pitch: %d\t roll: %d\t throttle: %d\n", rc.yaw, rc.pitch, rc.roll, rc.throttle);
+		printf("angx: %0.2f \tangy: %0.2f \theading: %0.2f\n", att.ang_x, att.ang_y, att.heading);
 
-	std::string response = msp_protocol.request_data(msp_attitude);
+		return 0;
+	}
 
-	attitude_frame att;
-	
-	att = parse.evaluate_attitude(response);
 
-	std::cout << "angx: " << att.ang_x << "\tangy: " << att.ang_y << "\theading: " << att.heading << std::endl;
+	// Read MSP RC
+	if (strcmp(argv[1], "105") == 0)
+	{
+
+		std::string response = msp_protocol.request_data(msp_read_rc);
+		std::cout << "Data Response: " << response << std::endl;
+		set_raw_rc_frame rc;
+
+		rc = parse.evaluate_raw_rc(response);
+
+		printf("yaw: %d\t pitch: %d\t roll: %d\t throttle: %d\n", rc.yaw, rc.pitch, rc.roll, rc.throttle);
+
+		return 0;
+	}
+
+
+	// Set MSP RC
+	if (strcmp(argv[1], "200") == 0)
+	{
+		uint8_t length = 4;
+
+		std::cout << "Arming..." << std::endl;
+		// Arm sequence
+		int arm_data[length] = {1500, 1500, 2000, 1000}; //roll, pitch, yaw, throttle
+
+		msp_protocol.set_data(msp_set_raw_rc, length, arm_data);
+
+		usleep(3*microseconds);
+
+		std::cout << "DisArming..." << std::endl;
+		// Arm sequence
+		int disarm_data[length] = {1500, 1500, 1000, 1000}; //roll, pitch, yaw, throttle
+
+		msp_protocol.set_data(msp_set_raw_rc, length, disarm_data);
+
+		return 0;
+	}
+
 
 	return 0;
 	

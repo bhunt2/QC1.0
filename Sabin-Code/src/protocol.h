@@ -43,10 +43,11 @@ private:
 	void msp_command(uint8_t, uint8_t, int*);
 
 	std::string read();
-	std::string string_to_hex(const std::string&);
+
+	std::string string_to_hex(const std::string&);
 
 public:
-	protocol();
+	protocol(int);
 
 	~protocol();
 

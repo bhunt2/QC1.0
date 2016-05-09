@@ -10,9 +10,9 @@ struct ident_frame {
 };
 
 struct attitude_frame {
-	signed int ang_x; // 16 bit Range [-1800;1800] (unit: 1/10 degree)
-	signed int ang_y; // 16 bit Range [-900;900] (unit: 1/10 degree)
-	signed int heading; // 16 bit [-180;180]
+	float ang_x; // 16 bit Range [-1800;1800] (unit: 1/10 degree)
+	float ang_y; // 16 bit Range [-900;900] (unit: 1/10 degree)
+	float heading; // 16 bit [-180;180]
 };
 
 struct altitude_frame {
@@ -21,7 +21,7 @@ struct altitude_frame {
 };
 
 struct set_raw_rc_frame {
-	unsigned int roll;
+	uint16_t roll;
 	unsigned int pitch;
 	unsigned int yaw;
 	unsigned int throttle;

@@ -8,8 +8,8 @@
 #include "types.h"
 
 
-protocol::protocol(){
-	DEBUG = 0;
+protocol::protocol(int debug){
+	DEBUG = debug;
 	setup_uart();
 }
 
@@ -127,14 +127,14 @@ void protocol::msp_command(uint8_t opcode, uint8_t data_length, int* params){
 	uint8_t checksum = 0;
 
     // Calculate checksum
-    checksum = checksum ^ sizeof(params) ^ opcode;
+    checksum = checksum ^ data_length ^ opcode;
 	
 	// Pack frame
 
-	buf << to_fc_header << (char)sizeof(params) << (char)opcode;
+	buf << to_fc_header << (char)data_length << (char)opcode;
 	
 	// Pack the data parameters
-	for (int i = 0; i <= data_length; i++)
+	for (int i = 0; i < data_length; i++)
 	{
 		buf << (char)params[i];
 
@@ -148,7 +148,7 @@ void protocol::msp_command(uint8_t opcode, uint8_t data_length, int* params){
 	std::string frame_string = buf.str();
 	
 	// Send packed frame
-    	device->writeStr(frame_string);
+    device->writeStr(frame_string);
 
 	if(DEBUG == 1)
 	{

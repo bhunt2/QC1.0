@@ -23,6 +23,7 @@ class parsers
 
 		set_raw_rc_frame evaluate_raw_rc(std::string);
 
+		std::string reverse(std::string);
 };
 
 #endif
