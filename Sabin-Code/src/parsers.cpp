@@ -55,11 +55,11 @@ set_raw_rc_frame parsers::evaluate_raw_rc(std::string data){
 
 	rc.roll = (uint16_t) *msp_data;
 	msp_data += 2;
-	rc.pitch = (unsigned int)*msp_data;
+	rc.pitch = (uint16_t)*msp_data;
 	msp_data += 2;
-	rc.yaw = (unsigned int)*msp_data;
+	rc.yaw = (uint16_t)*msp_data;
 	msp_data += 2;
-	rc.throttle = (unsigned int)*msp_data;
+	rc.throttle = (uint16_t)*msp_data;
 	
 	return rc;
 }
