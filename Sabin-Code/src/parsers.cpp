@@ -1,4 +1,9 @@
 #include <string>
+#include <stdint.h>
+#include <endian.h>
+#include <iostream>
+#include <stdio.h>
+
 
 #include "parsers.h"
 
@@ -22,11 +27,11 @@ attitude_frame parsers::evaluate_attitude(std::string data){
 	// Step through frame to data
 	msp_data += 5;
 	
-	attitude.ang_x = (float)*msp_data / 10;
+	attitude.ang_x = (int)*msp_data / 10;
 	msp_data += 2;
-	attitude.ang_y = (float)*msp_data / 10;
+	attitude.ang_y = (int)*msp_data / 10;
 	msp_data += 2;
-	attitude.heading = (float)*msp_data;
+	attitude.heading = (int)*msp_data;
 
 	return attitude;
 }
@@ -35,6 +40,28 @@ void parsers::evaluate_altitude(std::string data){
 	return;
 }
 
-void parsers::evaluate_raw_rc(std::string data){
-	return;
+set_raw_rc_frame parsers::evaluate_raw_rc(std::string data){
+		
+
+	std::string rx_frame;
+		
+	rx_frame.append(data);
+
+	const char * msp_data = rx_frame.data();
+		
+	set_raw_rc_frame rc;
+
+	msp_data += 5;
+
+	rc.roll = (unsigned int)*msp_data;
+	msp_data += 2;
+	rc.pitch = (unsigned int)*msp_data;
+	msp_data += 2;
+	rc.yaw = (unsigned int)*msp_data;
+	msp_data += 2;
+	rc.throttle = (unsigned int)*msp_data;
+	
+	return rc;
+	
+	
 }

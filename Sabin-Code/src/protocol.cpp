@@ -7,12 +7,31 @@
 
 #include "types.h"
 
+
 protocol::protocol(){
+	DEBUG = 0;
 	setup_uart();
 }
 
 protocol::~protocol(){
 	delete device;
+}
+
+
+std::string protocol::string_to_hex(const std::string& input)
+{
+    static const char* const lut = "0123456789ABCDEF";
+    size_t len = input.length();
+
+    std::string output;
+    output.reserve(2 * len);
+    for (size_t i = 0; i < len; ++i)
+    {
+        const unsigned char c = input[i];
+        output.push_back(lut[c >> 4]);
+        output.push_back(lut[c & 15]);
+    }
+    return output;
 }
 
 void protocol::setup_uart(){
@@ -68,7 +87,8 @@ void protocol::msp_request(uint8_t opcode){
 	// Send packed frame
     device->writeStr(frame_string);
 	
-	/*if(DEBUG == 1)
+
+	if(DEBUG == 1)
 	{
 		std::cout << "\n\n\t\t" << "Header\t     Size\t      Command\t       CRC\n";
 		std::cout << "Sending Frame:\t";
@@ -97,20 +117,21 @@ void protocol::msp_request(uint8_t opcode){
 			ctr++;
 		}
 		std::cout << "\n\n\n";
-	}*/
+	}
 }
 
-void protocol::msp_command(uint8_t opcode, uint8_t data_length, uint8_t* params){
+void protocol::msp_command(uint8_t opcode, uint8_t data_length, int* params){
 
 	std::ostringstream buf;
 
 	uint8_t checksum = 0;
 
     // Calculate checksum
-    checksum = checksum ^ data_length ^ opcode;
+    checksum = checksum ^ sizeof(params) ^ opcode;
 	
 	// Pack frame
-	buf << to_fc_header << (char)data_length << (char)opcode;
+
+	buf << to_fc_header << (char)sizeof(params) << (char)opcode;
 	
 	// Pack the data parameters
 	for (int i = 0; i <= data_length; i++)
@@ -127,7 +148,38 @@ void protocol::msp_command(uint8_t opcode, uint8_t data_length, uint8_t* params)
 	std::string frame_string = buf.str();
 	
 	// Send packed frame
-    device->writeStr(frame_string);
+    	device->writeStr(frame_string);
+
+	if(DEBUG == 1)
+	{
+		std::cout << "\n\n\t\t" << "Header\t     Size\t      Command\t       CRC\n";
+		std::cout << "Sending Frame:\t";
+		uint8_t ctr = 1;
+		for ( std::string::iterator it = frame_string.begin(); it != frame_string.end(); ++it)
+		{
+			std::cout << *it;
+			if(ctr == 3 || ctr == 4 || ctr == 5)
+			{
+				std::cout << "\t:\t";
+			}
+			ctr++;
+		}
+		
+		std::string display_string;
+		display_string.assign(string_to_hex(frame_string));
+		std::cout << "\n\t\t";
+		ctr = 1;
+		for ( std::string::iterator it = display_string.begin(); it != display_string.end(); ++it)
+		{
+			std::cout << *it;
+			if(ctr == 6 || ctr == 8 || ctr == 10)
+			{
+				std::cout << "\t:\t";
+			}
+			ctr++;
+		}
+		std::cout << "\n\n\n";
+	}
 	
 }
 
@@ -193,7 +245,7 @@ std::string protocol::request_data(uint8_t opcode){
 
 }
 
-std::string protocol::request_data(uint8_t opcode, uint8_t param_length, uint8_t* params){
+std::string protocol::request_data(uint8_t opcode, uint8_t param_length, int* params){
 
 	std::cout << "Sending Command: " << opcode << std::endl;
 
@@ -205,9 +257,10 @@ std::string protocol::request_data(uint8_t opcode, uint8_t param_length, uint8_t
 
 }
 
-void protocol::set_data(uint8_t opcode, uint8_t param_length, uint8_t* params){
+void protocol::set_data(uint8_t opcode, uint8_t param_length, int* params){
 
 	std::cout << "Sending Command: " << opcode << std::endl;
 
 	msp_command(opcode, param_length, params);
 }
+

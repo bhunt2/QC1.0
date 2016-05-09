@@ -21,7 +21,7 @@ class parsers
 
 		void evaluate_identification(std::string);
 
-		void evaluate_raw_rc(std::string);
+		set_raw_rc_frame evaluate_raw_rc(std::string);
 
 };
 

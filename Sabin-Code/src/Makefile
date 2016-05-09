@@ -3,12 +3,14 @@ CC=g++
 
 CFLAGS=-c -Wall
 
+MRAALIB= -lmraa
+
 # Compile
 all: drone
 
 # Create drone object executable
 drone: main.o protocol.o parsers.o types.o
-	$(CC) main.o protocol.o parsers.o types.o -o drone
+	$(CC) $(MRAALIB) main.o protocol.o parsers.o types.o -o drone
 
 # Create main object
 main.o: main.cpp

@@ -40,10 +40,10 @@ private:
 
 	void msp_request(uint8_t);
 
-	void msp_command(uint8_t, uint8_t, uint8_t*);
+	void msp_command(uint8_t, uint8_t, int*);
 
 	std::string read();
-
+	std::string string_to_hex(const std::string&);
 
 public:
 	protocol();
@@ -52,9 +52,9 @@ public:
 
 	std::string request_data(uint8_t);
 
-	std::string request_data(uint8_t, uint8_t, uint8_t*);
+	std::string request_data(uint8_t, uint8_t, int*);
 
-	void set_data(uint8_t, uint8_t, uint8_t*);
+	void set_data(uint8_t, uint8_t, int*);
 	 
 };
 
