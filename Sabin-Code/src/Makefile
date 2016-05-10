@@ -5,6 +5,8 @@ CFLAGS=-c -Wall
 
 MRAALIB= -lmraa
 
+GGDB=-ggdb
+
 # Compile
 all: drone
 
@@ -14,19 +16,19 @@ drone: main.o protocol.o parsers.o types.o
 
 # Create main object
 main.o: main.cpp
-	$(CC) $(CFLAGS) -c main.cpp
+	$(CC) $(CFLAGS) $(GGDB) -c main.cpp
 
 # Create Protocol object
 protocol.o: protocol.cpp
-	$(CC) $(CFLAGS) -c protocol.cpp
+	$(CC) $(CFLAGS) $(GGDB) -c protocol.cpp
 
 # Create parsers object
 parsers.o: parsers.cpp
-	$(CC) $(CFLAGS) -c parsers.cpp
+	$(CC) $(CFLAGS) $(GGDB) -c parsers.cpp
 
 # Create types object
 types.o: types.cpp
-	$(CC) $(CFLAGS) -c types.cpp
+	$(CC) $(CFLAGS) $(GGDB) -c types.cpp
 
 # Clean all the objects
 clean:
