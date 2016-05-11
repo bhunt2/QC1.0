@@ -33,8 +33,8 @@ int main(int argc, char* argv[]){
 	parsers parse;
 
 	// Read Attitude
-	if (strcmp(argv[1], "108") == 0)
-	{
+	if (strcmp(argv[1], "108") == 0
+)	{
 		std::string response = msp_protocol.request_data(msp_attitude);
 		std::cout << "Data Response: " << response << std::endl;
 
