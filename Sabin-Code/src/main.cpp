@@ -68,21 +68,40 @@ int main(int argc, char* argv[]){
 	// Set MSP RC
 	if (strcmp(argv[1], "200") == 0)
 	{
-		uint8_t length = 4;
+		uint8_t length = 8;
 
 		std::cout << "Arming..." << std::endl;
 		// Arm sequence
-		int arm_data[length] = {1500, 1500, 2000, 1000}; //roll, pitch, yaw, throttle
+		uint16_t arm_data[length] = {1500, 1500, 2000, 1000, 1000, 1000, 1000, 1000}; //roll, pitch, yaw, throttle
 
-		msp_protocol.set_data(msp_set_raw_rc, length, arm_data);
+		std::string response_arm = msp_protocol.request_data(msp_set_raw_rc, 16, arm_data);
+
+		std::cout << "Data Response Arm: " << response_arm << std::endl;
+
+		set_raw_rc_frame rc_arm;
+
+		rc_arm = parse.evaluate_raw_rc(response_arm);
+
+		printf("roll: %u\t pitch: %u\t yaw: %u\t throttle: %u\n", rc_arm.roll, rc_arm.pitch, rc_arm.yaw, rc_arm.throttle);
+
 
 		usleep(3*microseconds);
 
+
 		std::cout << "DisArming..." << std::endl;
 		// Arm sequence
-		int disarm_data[length] = {1500, 1500, 1000, 1000}; //roll, pitch, yaw, throttle
+		uint16_t disarm_data[length] = {1500, 1500, 1000, 1000, 1000, 1000, 1000, 1000}; //roll, pitch, yaw, throttle
 
-		msp_protocol.set_data(msp_set_raw_rc, length, disarm_data);
+		std::string response_disarm = msp_protocol.request_data(msp_set_raw_rc, 16, disarm_data);
+
+		std::cout << "Data Response Disarm: " << response_arm << std::endl;
+
+		set_raw_rc_frame rc_disarm;
+
+		rc_disarm = parse.evaluate_raw_rc(response_disarm);
+
+		printf("roll: %u\t pitch: %u\t yaw: %u\t throttle: %u\n", rc_disarm.roll, rc_disarm.pitch, rc_disarm.yaw, rc_disarm.throttle);
+		
 
 		return 0;
 	}

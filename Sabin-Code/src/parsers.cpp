@@ -12,25 +12,36 @@ void parsers::evaluate_identification(std::string data){
 
 }
 
-attitude_frame parsers::evaluate_attitude(std::string data){
+attitude_frame parsers::evaluate_attitude(std::string rx_frame){
 	
-	std::string rx_frame;
-	
-	// Get the data back for that command
-	rx_frame.append(data);
-
-	const char * msp_data = rx_frame.data();
+	std::string temp;
 	
 	attitude_frame attitude;
 
 	// Step through frame to data
-	msp_data += 5;
-	
-	attitude.ang_x = (float)*msp_data / 10;
-	msp_data += 2;
-	attitude.ang_y = (float)*msp_data / 10;
-	msp_data += 2;
-	attitude.heading = (float)*msp_data;
+
+	// extract ang_x
+
+	temp.append(string_to_hex(rx_frame.substr(6,1)));
+	temp.append(string_to_hex(rx_frame.substr(5,1)));
+
+	attitude.ang_x = ((float)(strtol(temp.c_str(), NULL, 16))/10);
+
+	temp.clear();
+
+	// extract ang_y
+	temp.append(string_to_hex(rx_frame.substr(8,1)));
+	temp.append(string_to_hex(rx_frame.substr(7,1)));
+
+	attitude.ang_y = ((float)(strtol(temp.c_str(), NULL, 16))/10);
+
+	temp.clear();
+
+	// extract heading
+	temp.append(string_to_hex(rx_frame.substr(10,1)));
+	temp.append(string_to_hex(rx_frame.substr(9,1)));
+
+	attitude.heading = ((float)(strtol(temp.c_str(), NULL, 16)));
 
 	return attitude;
 }
@@ -42,12 +53,23 @@ void parsers::evaluate_altitude(std::string data){
 set_raw_rc_frame parsers::evaluate_raw_rc(std::string rx_frame){
 
 	set_raw_rc_frame rc;
+
+	if (rx_frame.empty())
+	{
+		return rc;
+	}
+
+	// 22 is expected number of bytes
+	if (rx_frame.length() < 22)
+	{
+		return rc;
+	}
+
 	
 	std::string temp;
 
 	// Take a LSB byte and convert it to hex.
 	// Then convert to hex to get value
-
 
 	// Parse YAW
 	temp.append(string_to_hex(rx_frame.substr(6,1)));

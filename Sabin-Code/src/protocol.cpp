@@ -120,7 +120,7 @@ void protocol::msp_request(uint8_t opcode){
 	}
 }
 
-void protocol::msp_command(uint8_t opcode, uint8_t data_length, int* params){
+void protocol::msp_command(uint8_t opcode, uint8_t data_length, uint16_t* params){
 
 	std::ostringstream buf;
 
@@ -134,11 +134,10 @@ void protocol::msp_command(uint8_t opcode, uint8_t data_length, int* params){
 	buf << to_fc_header << (char)data_length << (char)opcode;
 	
 	// Pack the data parameters
-	for (int i = 0; i < data_length; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		buf << (char)params[i];
-
 		checksum = checksum ^ params[i];
+		buf << (char)params[i];		
 	}
 
 	// Append the checksum
@@ -249,7 +248,7 @@ std::string protocol::request_data(uint8_t opcode){
 
 // Sends the parameter to the Flight controller w/ command code
 // and reads the response back
-std::string protocol::request_data(uint8_t opcode, uint8_t param_length, int* params){
+std::string protocol::request_data(uint8_t opcode, uint8_t param_length, uint16_t* params){
 
 	std::cout << "Sending Command: " << opcode << std::endl;
 
@@ -263,7 +262,7 @@ std::string protocol::request_data(uint8_t opcode, uint8_t param_length, int* pa
 
 // Just send the command w/parameters to set
 // Does not return any responses.
-void protocol::set_data(uint8_t opcode, uint8_t param_length, int* params){
+void protocol::set_data(uint8_t opcode, uint8_t param_length, uint16_t* params){
 
 	std::cout << "Sending Command: " << opcode << std::endl;
 
