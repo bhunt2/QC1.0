@@ -42,6 +42,8 @@ private:
 
 	void msp_command(uint8_t, uint8_t, uint16_t*);
 
+	void set_rc(uint8_t, uint8_t, uint16_t[12]);
+
 	std::string read();
 
 	std::string string_to_hex(const std::string&);
@@ -51,11 +53,15 @@ public:
 
 	~protocol();
 
+	void arm();
+
+	void disarm();
+
+	void set_motor_controls(uint16_t,uint16_t,uint16_t,uint16_t);
+
 	std::string request_data(uint8_t);
 
 	std::string request_data(uint8_t, uint8_t, uint16_t*);
-
-	void set_data(uint8_t, uint8_t, uint16_t*);
 	 
 };
 

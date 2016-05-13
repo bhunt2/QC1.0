@@ -2,9 +2,9 @@
 #include <exception>
 #include <iostream>
 #include <sstream>
+#include <time.h>
 
 #include "protocol.h"
-
 #include "types.h"
 
 
@@ -235,6 +235,111 @@ std::string protocol::read(){
 	return buf;
 }
 
+
+void protocol::set_rc(uint8_t opcode, uint8_t ploadsize, uint16_t pload_in[12]){
+    
+    time_t timer = 0;
+
+    time_t start = difftime(time(NULL),0);
+
+    unsigned int microseconds = 1000000;
+
+    while (timer < 0.5){
+
+	    char msp_string[20];
+	    char aggregate[20];
+	    char checksum=0;
+	  
+	    uint8_t msb_pl=0;
+	    uint8_t lsb_pl=1;
+
+	    // Aggregate data
+	    for(int i=0;i<ploadsize;i++){
+	      aggregate[msb_pl]=pload_in[i] & 0xff;
+	      msb_pl=msb_pl+2;
+
+	      aggregate[lsb_pl]=pload_in[i] >> 8;
+	      lsb_pl=lsb_pl+2;
+	    }
+
+	    // Add Size
+	    msp_string[0]=ploadsize*2 & 0xff;
+	    checksum ^= (ploadsize*2 & 0xFF);
+
+	    // Add MSP Command Code
+	    msp_string[1]=opcode & 0xff;
+	    checksum ^= (opcode & 0xFF);
+
+	    // Calculate Checksum
+	    for(int j=0;j<(ploadsize*2);j++){
+	      msp_string[2+j]=aggregate[j] & 0xff;
+	      checksum ^= (aggregate[j] & 0xff);
+	    }
+
+	    // Add Checksum  
+	    msp_string[ploadsize*2+2]= checksum;
+	    
+	    std::ostringstream buf;
+
+	    // Add header to the buffer
+	    buf << to_fc_header;
+
+	    // Add each of byte from string to the buffer
+	    for(int u=0;u<(ploadsize*2+3);u++){
+	    	buf << msp_string[u];
+	    }
+
+	    // Send the buffer data to Flight Controller
+	    device->writeStr(buf.str());
+
+        usleep(microseconds*0.05);
+
+        timer = timer + (difftime(time(NULL),start));
+
+        start =  time(NULL);
+    }
+
+}
+
+
+void protocol::arm(){
+
+	uint8_t length = 8;
+
+	std::cout << "\nArming..." << std::endl;
+
+	// Arm sequence
+	//--------------------------//roll, pitch, yaw, throttle, aux1, aux2, aux3, aux4
+	uint16_t arm_data[length] = {1500, 1500, 2000, 1000, 1000, 1000, 1000, 1000}; 
+
+	set_rc(msp_set_raw_rc, length, arm_data);
+}
+
+
+void protocol::disarm(){
+
+	uint8_t length = 8;
+
+	std::cout << "\n\nDisArming..." << std::endl;
+	// Arm sequence	
+	//--------------------------//roll, pitch, yaw, throttle, aux1, aux2, aux3, aux4
+	uint16_t disarm_data[length] = {1500, 1500, 1000, 1000, 1000, 1000, 1000, 1000};
+	
+	set_rc(msp_set_raw_rc, length, disarm_data);
+}
+
+
+void protocol::set_motor_controls(uint16_t roll, uint16_t pitch, uint16_t yaw, uint16_t throttle){
+
+	uint8_t length = 8;
+
+	uint16_t disarm_data[length] = {roll, pitch, yaw, throttle, 1000, 1000, 1000, 1000};
+	
+	set_rc(msp_set_raw_rc, length, disarm_data);
+
+}
+
+
 // Only takes in command code
 // and reads the response back
 std::string protocol::request_data(uint8_t opcode){
@@ -262,13 +367,3 @@ std::string protocol::request_data(uint8_t opcode, uint8_t param_length, uint16_
 	return read();
 
 }
-
-// Just send the command w/parameters to set
-// Does not return any responses.
-void protocol::set_data(uint8_t opcode, uint8_t param_length, uint16_t* params){
-
-	std::cout << "Sending Command: " << opcode << std::endl;
-
-	msp_command(opcode, param_length, params);
-}
-
