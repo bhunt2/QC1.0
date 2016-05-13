@@ -57,7 +57,7 @@ public:
 
 	void disarm();
 
-	void set_motor_controls(uint16_t,uint16_t,uint16_t,uint16_t);
+	void set_flight_controls(uint16_t,uint16_t,uint16_t,uint16_t);
 
 	std::string request_data(uint8_t);
 

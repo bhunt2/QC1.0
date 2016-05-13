@@ -329,7 +329,7 @@ void protocol::disarm(){
 }
 
 
-void protocol::set_motor_controls(uint16_t roll, uint16_t pitch, uint16_t yaw, uint16_t throttle){
+void protocol::set_flight_controls(uint16_t roll, uint16_t pitch, uint16_t yaw, uint16_t throttle){
 
 	uint8_t length = 8;
 

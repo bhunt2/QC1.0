@@ -2,6 +2,8 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+extern unsigned int microseconds;
+
 extern uint8_t msp_ident;
 
 extern uint8_t msp_attitude;

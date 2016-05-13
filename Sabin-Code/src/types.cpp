@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+unsigned int microseconds = 1000000;
+
 uint8_t msp_ident = 100;
 
 uint8_t msp_attitude = 108;
