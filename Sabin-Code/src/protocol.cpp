@@ -137,7 +137,10 @@ void protocol::msp_command(uint8_t opcode, uint8_t data_length, uint16_t* params
 	for (int i = 0; i < 8; i++)
 	{
 		checksum = checksum ^ params[i];
-		buf << (char)params[i];		
+		std::ostringstream temp;
+		temp << std::hex << params[i];
+		buf << params[i];
+		//buf << itoa(params[i], 16);		
 	}
 
 	// Append the checksum
