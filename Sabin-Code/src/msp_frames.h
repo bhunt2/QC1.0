@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <string>
 
 #ifndef MSP_FRAMES_H
 #define MSP_FRAMES_H
@@ -38,6 +39,20 @@ struct set_raw_rc_frame {
 		yaw(0),
 		throttle(0)
 		{}
+};
+
+struct read_frame{
+	std::string header;
+	uint8_t payload_size;
+	uint8_t opcode;
+	std::string payload;
+	int total_bytes;
+
+	read_frame() :
+		payload_size(0),
+		opcode(0),
+		total_bytes(0)
+	{}
 };
 
 #endif

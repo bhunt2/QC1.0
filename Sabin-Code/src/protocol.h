@@ -1,6 +1,7 @@
 #include <string>
 
 #include "mraa.hpp"
+#include "msp_frames.h"
 
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
@@ -10,6 +11,18 @@ class protocol
 {
 
 private:
+	
+	// Read Parse State
+	enum state
+	{
+		start,
+		header,
+		payloadsize,
+		opcode,
+		payload
+	};
+
+	state curr_state;
 
 	// UART Device object
 	mraa::Uart* device;
@@ -34,6 +47,9 @@ private:
 			{}
 	} uartsetup;
 
+	
+
+
 	// Setup the UART 
 	void setup_uart();
 
@@ -45,7 +61,11 @@ private:
 
 	std::string read();
 
+	read_frame read_new();
+
 	std::string string_to_hex(const std::string&);
+
+	uint8_t read8();
 
 public:
 	protocol();
@@ -61,6 +81,8 @@ public:
 
 	//---------------------- distance, speed, height
 	void set_flight_controls(float, float, float);
+
+	read_frame request_data_frame(uint8_t opcode);
 
 	std::string request_data(uint8_t);
 

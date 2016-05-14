@@ -15,6 +15,8 @@
 
 protocol::protocol(){
 	setup_uart();
+
+	curr_state = start;
 }
 
 protocol::~protocol(){
@@ -35,9 +37,11 @@ void protocol::arm(){
 
 	// Arm sequence
 	//--------------------------//roll, pitch, yaw, throttle, aux1, aux2, aux3, aux4
-	uint16_t arm_data[length] = {1500, 1500, 2000, 1000, 1000, 1000, 1000, 1000}; 
+	uint16_t arm_data[length] = {1500, 1500, 2000, 1000, 0, 0, 0, 0}; 
 
-	set_rc(msp_set_raw_rc, length, arm_data);
+	while(true){
+		set_rc(msp_set_raw_rc, length, arm_data);
+	}
 }
 
 
@@ -48,7 +52,7 @@ void protocol::disarm(){
 	std::cout << "\n\nDisArming..." << std::endl;
 	// Arm sequence	
 	//--------------------------//roll, pitch, yaw, throttle, aux1, aux2, aux3, aux4
-	uint16_t disarm_data[length] = {1500, 1500, 1000, 1000, 1000, 1000, 1000, 1000};
+	uint16_t disarm_data[length] = {1500, 1500, 1000, 1000, 0, 0, 0, 0};
 	
 	set_rc(msp_set_raw_rc, length, disarm_data);
 }
@@ -58,7 +62,7 @@ void protocol::set_flight_controls(uint16_t roll, uint16_t pitch, uint16_t yaw, 
 
 	uint8_t length = 8;
 
-	uint16_t disarm_data[length] = {roll, pitch, yaw, throttle, 1000, 1000, 1000, 1000};
+	uint16_t disarm_data[length] = {roll, pitch, yaw, throttle, 0, 0, 0, 0};
 	
 	set_rc(msp_set_raw_rc, length, disarm_data);
 
@@ -85,6 +89,15 @@ std::string protocol::request_data(uint8_t opcode){
 
 	return read();
 
+}
+
+read_frame protocol::request_data_frame(uint8_t opcode){
+
+	msp_request(opcode);
+
+	usleep(500);
+
+	return read_new();
 }
 
 // Sends the parameter to the Flight controller w/ command code
@@ -357,39 +370,74 @@ void protocol::set_rc(uint8_t opcode, uint8_t ploadsize, uint16_t pload_in[12]){
 
 }
 
-std::string protocol::read(){
-	// Establish variables for use in receiving data
-	std::string buf;
-    int to_counter = 0;
-	int bytes_ctr = 0;
-	/*
-	typedef enum state
-	{
-		none,
-		header
-	} curr_state;
+read_frame protocol::read_new(){
 
-	curr_state = none;
+	int no_data = 0;
 
-	while(true){
+	read_frame r_frame;
+
+	while(true && no_data < 3){
 		if (device->dataAvailable())
 		{
-			
-		}
-		header = self.ser.read()
-            if header == '$':
-                header = header+self.ser.read(2)
-                break
+			std::string r = device->readStr(1);
 
-	}
-*/
+			switch(curr_state){
+
+				case start:
+				case header:
+
+					if (r == "$"){
+						r_frame.header.append("$");
+						curr_state = header;
+					}
+					if(r == "M"){
+						r_frame.header.append("M");
+						curr_state = header;
+					}
+					if(r == ">"){
+						r_frame.header.append(">");
+						curr_state = payloadsize;
+					}
+
+					break;
+
+				case payloadsize:
+					r_frame.payload_size = ((uint8_t)strtoul(r.c_str(), NULL, 0))&0xff;
+					curr_state = opcode;
+					break;
+
+				case opcode:
+					r_frame.opcode = ((uint8_t)strtoul(r.c_str(), NULL, 0))&0xff;
+					curr_state = payload;
+					break;
+
+				case payload:
+					r_frame.payload.append(r);
+					curr_state = payload;
+					break;
+				default:
+					break;
+			} // End Switch
+
+		}else{
+			no_data++;
+			usleep(1000);
+		} // End data available check
+
+	} // End while loop
+
+	return r_frame;
 
 
+}
 
-
-
-
-
+std::string protocol::read(){
+	// Establish variables for use in receiving data
+	
+    int to_counter = 0;
+	int bytes_ctr = 0;
+	
+	std::string buf;
 
 	// Check for data availability on the UART
 	// Do once, then continue unless time has run out 
@@ -433,6 +481,8 @@ std::string protocol::read(){
 	}
 	
 	return buf;
+
+
 }
 
 
@@ -450,4 +500,26 @@ std::string protocol::string_to_hex(const std::string& input)
         output.push_back(lut[c & 15]);
     }
     return output;
+}
+
+/*
+uint32_t protocol::read32() {
+  uint32_t t = read16();
+  t+= (uint32_t)read16()<<16;
+  return t;
+}
+
+uint16_t protocol::read16() {
+  uint16_t t = read8();
+  t+= (uint16_t)read8()<<8;
+  return t;
+}
+
+*/
+
+uint8_t protocol::read8()  {
+  // Read byte
+  uint8_t c = (uint8_t)strtoul(device->readStr(1).c_str(), NULL, 0);
+  //checksum ^= c;
+  return (c)&0xff;
 }

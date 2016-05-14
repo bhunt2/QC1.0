@@ -25,9 +25,14 @@ int main(int argc, char* argv[]){
 	// Read Attitude
 	if (strcmp(argv[1], "att") == 0)	
 	{
-		std::string response = msp_protocol.request_data(msp_attitude);
 
-		parse.evaluate_attitude(response);
+		 read_frame read = msp_protocol.request_data_frame(msp_attitude);
+
+		 parse.evaluate_attitude(read.payload);
+
+		//std::string response = msp_protocol.request_data_frame(msp_attitude);
+
+		//parse.evaluate_attitude(response);
 
 		return 0;
 	}
