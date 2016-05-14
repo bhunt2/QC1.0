@@ -11,9 +11,9 @@ class parsers
 		std::string string_to_hex(const std::string&);
 		
 	public:
-		//parsers();
+		parsers();
 		
-		//~parsers();
+		~parsers();
 
 		attitude_frame evaluate_attitude(std::string);
 

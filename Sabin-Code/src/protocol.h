@@ -57,7 +57,11 @@ public:
 
 	void disarm();
 
+    //----------------------- roll, pitch, yaw, throttle
 	void set_flight_controls(uint16_t,uint16_t,uint16_t,uint16_t);
+
+	//---------------------- distance, speed, height
+	void set_flight_controls(float, float, float);
 
 	std::string request_data(uint8_t);
 

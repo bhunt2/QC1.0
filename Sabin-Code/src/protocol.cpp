@@ -7,6 +7,11 @@
 #include "protocol.h"
 #include "types.h"
 
+/*
+	///////////////////////////////////////////////
+	CONSTRUCTORS
+	///////////////////////////////////////////////
+*/
 
 protocol::protocol(int debug){
 	DEBUG = debug;
@@ -17,6 +22,93 @@ protocol::~protocol(){
 	delete device;
 }
 
+/*
+	/////////////////////////////////////
+	PUBLIC FUNCTIONS
+	////////////////////////////////////
+*/
+
+void protocol::arm(){
+
+	uint8_t length = 8;
+
+	std::cout << "\nArming..." << std::endl;
+
+	// Arm sequence
+	//--------------------------//roll, pitch, yaw, throttle, aux1, aux2, aux3, aux4
+	uint16_t arm_data[length] = {1500, 1500, 2000, 1000, 1000, 1000, 1000, 1000}; 
+
+	set_rc(msp_set_raw_rc, length, arm_data);
+}
+
+
+void protocol::disarm(){
+
+	uint8_t length = 8;
+
+	std::cout << "\n\nDisArming..." << std::endl;
+	// Arm sequence	
+	//--------------------------//roll, pitch, yaw, throttle, aux1, aux2, aux3, aux4
+	uint16_t disarm_data[length] = {1500, 1500, 1000, 1000, 1000, 1000, 1000, 1000};
+	
+	set_rc(msp_set_raw_rc, length, disarm_data);
+}
+
+
+void protocol::set_flight_controls(uint16_t roll, uint16_t pitch, uint16_t yaw, uint16_t throttle){
+
+	uint8_t length = 8;
+
+	uint16_t disarm_data[length] = {roll, pitch, yaw, throttle, 1000, 1000, 1000, 1000};
+	
+	set_rc(msp_set_raw_rc, length, disarm_data);
+
+}
+
+
+void protocol::set_flight_controls(float distance, float speed, float height){
+
+	// Calculate the Throtle and Pitch here with the given paramter here
+	// and set the rc values using set_rc(opcode, payloadsize, payload)
+
+}
+
+
+// Only takes in command code
+// and reads the response back
+std::string protocol::request_data(uint8_t opcode){
+
+	std::cout << "Sending Command: " << opcode << std::endl;
+
+	msp_request(opcode);
+
+	usleep(500);
+
+	return read();
+
+}
+
+// Sends the parameter to the Flight controller w/ command code
+// and reads the response back
+std::string protocol::request_data(uint8_t opcode, uint8_t param_length, uint16_t* params){
+
+	std::cout << "Sending Command: " << opcode << std::endl;
+
+	msp_command(opcode, param_length, params);
+
+	usleep(500);
+
+	return read();
+
+}
+
+
+
+/*
+	///////////////////////////////////////////////
+	PRIVATE FUNCTIONS
+	///////////////////////////////////////////////
+*/
 
 std::string protocol::string_to_hex(const std::string& input)
 {
@@ -69,6 +161,36 @@ void protocol::setup_uart(){
 
 void protocol::msp_request(uint8_t opcode){
 
+	char msp_string[20];
+
+	uint8_t checksum = 0;
+
+	uint8_t ploadsize = 0;
+
+	msp_string[0]=ploadsize*2 & 0xff;
+    
+    checksum ^= (ploadsize*2 & 0xFF);
+    
+    msp_string[1]=opcode & 0xff;
+    
+    checksum ^= (opcode & 0xFF);
+    
+    msp_string[ploadsize*2+2]= checksum;
+
+	std::ostringstream buf;
+
+    // Add header to the buffer
+    buf << to_fc_header;
+
+    // Add each of byte from string to the buffer
+    for(int u=0;u<(ploadsize*2+3);u++){
+    	buf << msp_string[u];
+    }
+
+    // Send the buffer data to Flight Controller
+    device->writeStr(buf.str());
+
+    /*
 	std::ostringstream buf;
 
 	uint8_t length = 0;
@@ -118,6 +240,7 @@ void protocol::msp_request(uint8_t opcode){
 		}
 		std::cout << "\n\n\n";
 	}
+	*/
 }
 
 void protocol::msp_command(uint8_t opcode, uint8_t data_length, uint16_t* params){
@@ -183,56 +306,6 @@ void protocol::msp_command(uint8_t opcode, uint8_t data_length, uint16_t* params
 		std::cout << "\n\n\n";
 	}
 	
-}
-
-std::string protocol::read(){
-	// Establish variables for use in receiving data
-	std::string buf;
-    int to_counter = 0;
-	int bytes_ctr = 0;
-	
-	// Check for data availability on the UART
-	// Do once, then continue unless time has run out 
-	do
-	{
-		if(device->dataAvailable())
-		{
-			// Get known frame size back for now
-			buf.append(device->readStr(1));
-			
-			if(DEBUG == 1)
-			{
-				// State data is available only on the first byte
-				if(bytes_ctr == 0)
-				{
-					std::cout << "Data Available" << std::endl;
-				}
-				
-				// Count number of bytes received
-				bytes_ctr++;
-			}
-			
-			// Reset Time Out counter
-			to_counter = 0;
-		}
-		else
-		{
-			to_counter += 1;
-			if(to_counter == 1000)
-			{
-				std::cout << "No Serial Data Available.\n" << std::endl;
-				usleep(1000);
-			}
-			
-		}
-	}while(to_counter < 1000);
-	
-	if(DEBUG == 1)
-	{
-		std::cout << "Number of bytes received: " << bytes_ctr << std::endl;
-	}
-	
-	return buf;
 }
 
 
@@ -301,69 +374,53 @@ void protocol::set_rc(uint8_t opcode, uint8_t ploadsize, uint16_t pload_in[12]){
 
 }
 
-
-void protocol::arm(){
-
-	uint8_t length = 8;
-
-	std::cout << "\nArming..." << std::endl;
-
-	// Arm sequence
-	//--------------------------//roll, pitch, yaw, throttle, aux1, aux2, aux3, aux4
-	uint16_t arm_data[length] = {1500, 1500, 2000, 1000, 1000, 1000, 1000, 1000}; 
-
-	set_rc(msp_set_raw_rc, length, arm_data);
-}
-
-
-void protocol::disarm(){
-
-	uint8_t length = 8;
-
-	std::cout << "\n\nDisArming..." << std::endl;
-	// Arm sequence	
-	//--------------------------//roll, pitch, yaw, throttle, aux1, aux2, aux3, aux4
-	uint16_t disarm_data[length] = {1500, 1500, 1000, 1000, 1000, 1000, 1000, 1000};
+std::string protocol::read(){
+	// Establish variables for use in receiving data
+	std::string buf;
+    int to_counter = 0;
+	int bytes_ctr = 0;
 	
-	set_rc(msp_set_raw_rc, length, disarm_data);
-}
-
-
-void protocol::set_flight_controls(uint16_t roll, uint16_t pitch, uint16_t yaw, uint16_t throttle){
-
-	uint8_t length = 8;
-
-	uint16_t disarm_data[length] = {roll, pitch, yaw, throttle, 1000, 1000, 1000, 1000};
+	// Check for data availability on the UART
+	// Do once, then continue unless time has run out 
+	do
+	{
+		if(device->dataAvailable())
+		{
+			// Get known frame size back for now
+			buf.append(device->readStr(1));
+			
+			if(DEBUG == 1)
+			{
+				// State data is available only on the first byte
+				if(bytes_ctr == 0)
+				{
+					std::cout << "Data Available" << std::endl;
+				}
+				
+				// Count number of bytes received
+				bytes_ctr++;
+			}
+			
+			// Reset Time Out counter
+			to_counter = 0;
+		}
+		else
+		{
+			to_counter += 1;
+			if(to_counter == 1000)
+			{
+				std::cout << "No Serial Data Available.\n" << std::endl;
+				usleep(1000);
+			}
+			
+		}
+	}while(to_counter < 1000);
 	
-	set_rc(msp_set_raw_rc, length, disarm_data);
-
+	if(DEBUG == 1)
+	{
+		std::cout << "Number of bytes received: " << bytes_ctr << std::endl;
+	}
+	
+	return buf;
 }
 
-
-// Only takes in command code
-// and reads the response back
-std::string protocol::request_data(uint8_t opcode){
-
-	std::cout << "Sending Command: " << opcode << std::endl;
-
-	msp_request(opcode);
-
-	usleep(500);
-
-	return read();
-
-}
-
-// Sends the parameter to the Flight controller w/ command code
-// and reads the response back
-std::string protocol::request_data(uint8_t opcode, uint8_t param_length, uint16_t* params){
-
-	std::cout << "Sending Command: " << opcode << std::endl;
-
-	msp_command(opcode, param_length, params);
-
-	usleep(500);
-
-	return read();
-
-}
