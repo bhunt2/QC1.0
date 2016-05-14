@@ -10,7 +10,6 @@ class protocol
 {
 
 private:
-	bool DEBUG;
 
 	// UART Device object
 	mraa::Uart* device;
@@ -49,7 +48,7 @@ private:
 	std::string string_to_hex(const std::string&);
 
 public:
-	protocol(int);
+	protocol();
 
 	~protocol();
 

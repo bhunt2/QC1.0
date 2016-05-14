@@ -17,15 +17,8 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 
-	if (argc > 2)
-	{
-		std::cout << "Only 1 argument is expected." << std::endl;
-		std::cout << "Example: ./drone [msp command number]\n" << std::endl;
-		return 0;
-	}
 
-
-	protocol msp_protocol(1);
+	protocol msp_protocol;
 
 	parsers parse;
 
@@ -33,13 +26,8 @@ int main(int argc, char* argv[]){
 	if (strcmp(argv[1], "att") == 0)	
 	{
 		std::string response = msp_protocol.request_data(msp_attitude);
-		std::cout << "Data Response: " << response << std::endl;
 
-		attitude_frame att;
-
-		att = parse.evaluate_attitude(response);
-
-		printf("angx: %0.2f \tangy: %0.2f \theading: %0.2f\n", att.ang_x, att.ang_y, att.heading);
+		parse.evaluate_attitude(response);
 
 		return 0;
 	}
@@ -50,13 +38,8 @@ int main(int argc, char* argv[]){
 	{
 
 		std::string response = msp_protocol.request_data(msp_read_rc);
-		std::cout << "Data Response: " << response << std::endl;
-
-		set_raw_rc_frame rc;
-
-		rc = parse.evaluate_raw_rc(response);
-
-		printf("roll: %u\t pitch: %u\t yaw: %u\t throttle: %u\n", rc.roll, rc.pitch, rc.yaw, rc.throttle);
+		
+		parse.evaluate_raw_rc(response);
 
 		return 0;
 	}
@@ -72,8 +55,6 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 
-
-
 	// Set MSP RC
 	if (strcmp(argv[1], "disarm") == 0)
 	{
@@ -88,12 +69,19 @@ int main(int argc, char* argv[]){
 	if (strcmp(argv[1], "control") == 0)
 	{
 
+		if (argv[2] == NULL || argv[3] == NULL || argv[4] == NULL || argv[5] == NULL)
+		{
+			std::cout << "4 arguments expected! [Roll Pitch Yaw Throttle]" << std::endl;
+
+			return 0;
+		}
+
 		set_raw_rc_frame rc;
 
-		rc.roll = 1500;
-		rc.pitch = 1500;
-		rc.yaw = 1500;
-		rc.throttle = 1500;
+		rc.roll = (uint16_t) strtoul(argv[2], NULL, 0);
+		rc.pitch = (uint16_t) strtoul(argv[3], NULL, 0);
+		rc.yaw = (uint16_t) strtoul(argv[4], NULL, 0);
+		rc.throttle = (uint16_t) strtoul(argv[5], NULL, 0);
 
 		msp_protocol.set_flight_controls(rc.roll, rc.pitch, rc.yaw, rc.throttle);
 

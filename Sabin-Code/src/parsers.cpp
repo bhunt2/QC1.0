@@ -5,6 +5,30 @@
 #include <stdlib.h>
 
 #include "parsers.h"
+#include "types.h"
+
+
+/*
+	///////////////////////////////////////////////
+	CONSTRUCTORS
+	///////////////////////////////////////////////
+*/
+
+	parsers::parsers(){
+
+	}
+
+
+	parsers::~parsers(){
+		
+	}
+
+
+/*
+	///////////////////////////////////////////////
+	PUBLIC FUNCTIONS
+	///////////////////////////////////////////////
+*/	
 
 
 void parsers::evaluate_identification(std::string data){
@@ -42,6 +66,11 @@ attitude_frame parsers::evaluate_attitude(std::string rx_frame){
 	temp.append(string_to_hex(rx_frame.substr(9,1)));
 
 	attitude.heading = ((float)(strtol(temp.c_str(), NULL, 16)));
+
+	if(debug){
+
+		printf("angx: %0.2f \tangy: %0.2f \theading: %0.2f\n", attitude.ang_x, attitude.ang_y, attitude.heading);
+	}
 
 	return attitude;
 }
@@ -100,6 +129,10 @@ set_raw_rc_frame parsers::evaluate_raw_rc(std::string rx_frame){
 	temp.append(string_to_hex(rx_frame.substr(11,1)));
 
 	rc.throttle = strtoul(temp.c_str(), NULL, 16);
+
+	if(debug){
+		printf("roll: %u\t pitch: %u\t yaw: %u\t throttle: %u\n", rc.roll, rc.pitch, rc.yaw, rc.throttle);
+	}
 
 	return rc;
 }

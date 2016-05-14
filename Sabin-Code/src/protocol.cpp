@@ -13,8 +13,7 @@
 	///////////////////////////////////////////////
 */
 
-protocol::protocol(int debug){
-	DEBUG = debug;
+protocol::protocol(){
 	setup_uart();
 }
 
@@ -110,22 +109,6 @@ std::string protocol::request_data(uint8_t opcode, uint8_t param_length, uint16_
 	///////////////////////////////////////////////
 */
 
-std::string protocol::string_to_hex(const std::string& input)
-{
-    static const char* const lut = "0123456789ABCDEF";
-    size_t len = input.length();
-
-    std::string output;
-    output.reserve(2 * len);
-    for (size_t i = 0; i < len; ++i)
-    {
-        const unsigned char c = input[i];
-        output.push_back(lut[c >> 4]);
-        output.push_back(lut[c & 15]);
-    }
-    return output;
-}
-
 void protocol::setup_uart(){
 	try {
 		std::cout << "Initializing UART..." << std::endl;
@@ -210,7 +193,7 @@ void protocol::msp_request(uint8_t opcode){
     device->writeStr(frame_string);
 	
 
-	if(DEBUG == 1)
+	if(debug == 1)
 	{
 		std::cout << "\n\n\t\t" << "Header\t     Size\t      Command\t       CRC\n";
 		std::cout << "Sending Frame:\t";
@@ -275,7 +258,7 @@ void protocol::msp_command(uint8_t opcode, uint8_t data_length, uint16_t* params
 	// Send packed frame
     device->writeStr(frame_string);
 
-	if(DEBUG == 1)
+	if(debug == 1)
 	{
 		std::cout << "\n\n\t\t" << "Header\t     Size\t      Command\t       CRC\n";
 		std::cout << "Sending Frame:\t";
@@ -379,7 +362,35 @@ std::string protocol::read(){
 	std::string buf;
     int to_counter = 0;
 	int bytes_ctr = 0;
-	
+	/*
+	typedef enum state
+	{
+		none,
+		header
+	} curr_state;
+
+	curr_state = none;
+
+	while(true){
+		if (device->dataAvailable())
+		{
+			
+		}
+		header = self.ser.read()
+            if header == '$':
+                header = header+self.ser.read(2)
+                break
+
+	}
+*/
+
+
+
+
+
+
+
+
 	// Check for data availability on the UART
 	// Do once, then continue unless time has run out 
 	do
@@ -389,7 +400,7 @@ std::string protocol::read(){
 			// Get known frame size back for now
 			buf.append(device->readStr(1));
 			
-			if(DEBUG == 1)
+			if(debug == 1)
 			{
 				// State data is available only on the first byte
 				if(bytes_ctr == 0)
@@ -416,7 +427,7 @@ std::string protocol::read(){
 		}
 	}while(to_counter < 1000);
 	
-	if(DEBUG == 1)
+	if(debug == 1)
 	{
 		std::cout << "Number of bytes received: " << bytes_ctr << std::endl;
 	}
@@ -424,3 +435,19 @@ std::string protocol::read(){
 	return buf;
 }
 
+
+std::string protocol::string_to_hex(const std::string& input)
+{
+    static const char* const lut = "0123456789ABCDEF";
+    size_t len = input.length();
+
+    std::string output;
+    output.reserve(2 * len);
+    for (size_t i = 0; i < len; ++i)
+    {
+        const unsigned char c = input[i];
+        output.push_back(lut[c >> 4]);
+        output.push_back(lut[c & 15]);
+    }
+    return output;
+}

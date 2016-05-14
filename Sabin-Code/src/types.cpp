@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+bool debug = false;
+
 unsigned int microseconds = 1000000;
 
 uint8_t msp_ident = 100;
