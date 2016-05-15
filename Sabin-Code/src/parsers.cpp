@@ -38,13 +38,12 @@ void parsers::evaluate_identification(std::string data){
 
 attitude_frame parsers::evaluate_attitude(std::string rx_frame){
 	
-	std::string temp;
-	
 	attitude_frame attitude;
 
 	// Step through frame to data
+	/*
 
-	// extract ang_x
+	std::string temp;
 
 	temp.append(string_to_hex(rx_frame.substr(6,1)));
 	temp.append(string_to_hex(rx_frame.substr(5,1)));
@@ -66,8 +65,22 @@ attitude_frame parsers::evaluate_attitude(std::string rx_frame){
 	temp.append(string_to_hex(rx_frame.substr(9,1)));
 
 	attitude.heading = ((float)(strtol(temp.c_str(), NULL, 16)));
+	*/
+
+	const char * data = rx_frame.data();
+	
+	// Step through frame to data
+	data += 5;
+	
+	attitude.ang_x = (float)*data / 10;
+	data += 2;
+	attitude.ang_y = (float)*data / 10;
+	data += 2;
+	attitude.heading = (float)*data;
 
 	if(debug){
+
+		std::cout << "Response: " << rx_frame << "\n" << std::endl;
 
 		printf("angx: %0.2f \tangy: %0.2f \theading: %0.2f\n", attitude.ang_x, attitude.ang_y, attitude.heading);
 	}
@@ -75,8 +88,50 @@ attitude_frame parsers::evaluate_attitude(std::string rx_frame){
 	return attitude;
 }
 
-void parsers::evaluate_altitude(std::string data){
-	return;
+altitude_frame parsers::evaluate_altitude(std::string rx_frame){
+
+	std::string temp;
+
+	altitude_frame alt_frame;
+
+
+	if (rx_frame.substr(5,10).empty())
+	{
+		if (debug)
+		{
+			std::cout << "No Altitude Available!\n" << std::endl;
+		}
+
+		return alt_frame;
+	}
+
+	// 4 bytes for the estimated altitude value
+	temp.append(string_to_hex(rx_frame.substr(8,1)));
+	temp.append(string_to_hex(rx_frame.substr(7,1)));
+	temp.append(string_to_hex(rx_frame.substr(6,1)));
+	temp.append(string_to_hex(rx_frame.substr(5,1)));
+
+	alt_frame.est_alt = ((uint32_t)(strtoul(temp.c_str(), NULL, 16)));
+
+	temp.clear();
+
+	// 2 bytes for the vario value
+	temp.append(string_to_hex(rx_frame.substr(10,1)));
+	temp.append(string_to_hex(rx_frame.substr(9,1)));
+
+	alt_frame.vario = ((uint16_t)(strtoul(temp.c_str(), NULL, 16)));
+
+	temp.clear();
+
+
+	if(debug){
+
+		std::cout << "Response: " << rx_frame << "\n" << std::endl;
+
+		printf("est altitude: %d \tVario: %d\n", alt_frame.est_alt, alt_frame.vario);
+	}
+
+	return alt_frame;
 }
 
 set_raw_rc_frame parsers::evaluate_raw_rc(std::string rx_frame){

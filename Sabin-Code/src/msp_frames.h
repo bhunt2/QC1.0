@@ -25,6 +25,11 @@ struct attitude_frame {
 struct altitude_frame {
 	int32_t est_alt;
 	int16_t vario; 
+
+	altitude_frame() :
+	est_alt(0),
+	vario(0)
+	{}
 };
 
 struct set_raw_rc_frame {

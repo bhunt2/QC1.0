@@ -39,9 +39,8 @@ void protocol::arm(){
 	//--------------------------//roll, pitch, yaw, throttle, aux1, aux2, aux3, aux4
 	uint16_t arm_data[length] = {1500, 1500, 2000, 1000, 0, 0, 0, 0}; 
 
-	while(true){
-		set_rc(msp_set_raw_rc, length, arm_data);
-	}
+	set_rc(msp_set_raw_rc, length, arm_data);
+	
 }
 
 
@@ -61,6 +60,16 @@ void protocol::disarm(){
 void protocol::set_flight_controls(uint16_t roll, uint16_t pitch, uint16_t yaw, uint16_t throttle){
 
 	uint8_t length = 8;
+
+	// limit to [1000:2000] range
+	if (roll >= 2000){roll = 2000;}
+	if (roll <= 1000){roll = 1000;}
+	if (pitch >= 2000){pitch = 2000;}
+	if (pitch <= 1000){pitch = 1000;}
+	if (yaw >= 2000){yaw = 2000;}
+	if (yaw <= 1000){yaw = 1000;}
+	if (throttle >= 2000){throttle = 2000;}
+	if (throttle <= 1000){throttle = 1000;}
 
 	uint16_t disarm_data[length] = {roll, pitch, yaw, throttle, 0, 0, 0, 0};
 	

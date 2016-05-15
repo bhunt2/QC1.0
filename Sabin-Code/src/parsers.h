@@ -17,7 +17,7 @@ class parsers
 
 		attitude_frame evaluate_attitude(std::string);
 
-		void evaluate_altitude(std::string);
+		altitude_frame evaluate_altitude(std::string);
 
 		void evaluate_identification(std::string);
 
