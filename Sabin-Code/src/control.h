@@ -2,7 +2,7 @@
 #include <stdint.h>
 
 #include "protocol.h"
-
+#include "msp_frames.h"
 
 #ifndef CONTROL_H
 #define CONTROL_H
@@ -21,20 +21,26 @@ class control{
 
 		protocol msp_protocol;
 
-		void arm();
+		void set_flight_controls(set_raw_rc_frame);
 
-		void disarm();
-
-		//----------------------- roll, pitch, yaw, throttle
-		void set_flight_controls(uint16_t,uint16_t,uint16_t,uint16_t);
-
-		//---------------------- distance, speed, height
-		void set_flight_controls(float, float, float);
 
 	public:
 		//control();
 
 		//~control();
+
+		void arm();
+
+		void disarm();
+		
+		//--------------------- distance, speed, height
+		void follow(float, float, float);
+
+		// ---------- throttle
+		void throttle(uint16_t);
+
+		// -------------- throttle, pitch
+		void move_forward(uint16_t, uint16_t);
 
 		//--------max_throttle, time_to_hover_in_seconds
 		void hover(uint16_t, int);

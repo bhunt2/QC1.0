@@ -29,62 +29,16 @@ protocol::~protocol(){
 	////////////////////////////////////
 */
 
-void protocol::arm(){
+/*
+read_frame protocol::request_data_frame(uint8_t opcode){
 
-	uint8_t length = 8;
+	msp_request(opcode);
 
-	std::cout << "\nArming..." << std::endl;
+	usleep(500);
 
-	// Arm sequence
-	//--------------------------//roll, pitch, yaw, throttle, aux1, aux2, aux3, aux4
-	uint16_t arm_data[length] = {1500, 1500, 2000, 1000, 0, 0, 0, 0}; 
-
-	set_rc(msp_set_raw_rc, length, arm_data);
-	
+	return read_new();
 }
-
-
-void protocol::disarm(){
-
-	uint8_t length = 8;
-
-	std::cout << "\n\nDisArming..." << std::endl;
-	// Arm sequence	
-	//--------------------------//roll, pitch, yaw, throttle, aux1, aux2, aux3, aux4
-	uint16_t disarm_data[length] = {1500, 1500, 1000, 1000, 0, 0, 0, 0};
-	
-	set_rc(msp_set_raw_rc, length, disarm_data);
-}
-
-
-void protocol::set_flight_controls(uint16_t roll, uint16_t pitch, uint16_t yaw, uint16_t throttle){
-
-	uint8_t length = 8;
-
-	// limit to [1000:2000] range
-	if (roll >= 2000){roll = 2000;}
-	if (roll <= 1000){roll = 1000;}
-	if (pitch >= 2000){pitch = 2000;}
-	if (pitch <= 1000){pitch = 1000;}
-	if (yaw >= 2000){yaw = 2000;}
-	if (yaw <= 1000){yaw = 1000;}
-	if (throttle >= 2000){throttle = 2000;}
-	if (throttle <= 1000){throttle = 1000;}
-
-	uint16_t disarm_data[length] = {roll, pitch, yaw, throttle, 0, 0, 0, 0};
-	
-	set_rc(msp_set_raw_rc, length, disarm_data);
-
-}
-
-
-void protocol::set_flight_controls(float distance, float speed, float height){
-
-	// Calculate the Throtle and Pitch here with the given paramter here
-	// and set the rc values using set_rc(opcode, payloadsize, payload)
-
-}
-
+*/
 
 // Only takes in command code
 // and reads the response back
@@ -100,14 +54,6 @@ std::string protocol::request_data(uint8_t opcode){
 
 }
 
-read_frame protocol::request_data_frame(uint8_t opcode){
-
-	msp_request(opcode);
-
-	usleep(500);
-
-	return read_new();
-}
 
 // Sends the parameter to the Flight controller w/ command code
 // and reads the response back
@@ -123,6 +69,70 @@ std::string protocol::request_data(uint8_t opcode, uint8_t param_length, uint16_
 
 }
 
+
+void protocol::set_rc(uint8_t opcode, uint8_t ploadsize, uint16_t pload_in[12]){
+    
+    time_t timer = 0;
+
+    time_t start = difftime(time(NULL),0);
+
+    //unsigned int microseconds = 1000000;
+
+    while (timer < 0.5){
+
+	    char msp_string[20];
+	    char aggregate[20];
+	    char checksum=0;
+	  
+	    uint8_t msb_pl=0;
+	    uint8_t lsb_pl=1;
+
+	    // Aggregate data
+	    for(int i=0;i<ploadsize;i++){
+	      aggregate[msb_pl]=pload_in[i] & 0xff;
+	      msb_pl=msb_pl+2;
+
+	      aggregate[lsb_pl]=pload_in[i] >> 8;
+	      lsb_pl=lsb_pl+2;
+	    }
+
+	    // Add Size
+	    msp_string[0]=ploadsize*2 & 0xff;
+	    checksum ^= (ploadsize*2 & 0xFF);
+
+	    // Add MSP Command Code
+	    msp_string[1]=opcode & 0xff;
+	    checksum ^= (opcode & 0xFF);
+
+	    // Calculate Checksum
+	    for(int j=0;j<(ploadsize*2);j++){
+	      msp_string[2+j]=aggregate[j] & 0xff;
+	      checksum ^= (aggregate[j] & 0xff);
+	    }
+
+	    // Add Checksum  
+	    msp_string[ploadsize*2+2]= checksum;
+	    
+	    std::ostringstream buf;
+
+	    // Add header to the buffer
+	    buf << to_fc_header;
+
+	    // Add each of byte from string to the buffer
+	    for(int u=0;u<(ploadsize*2+3);u++){
+	    	buf << msp_string[u];
+	    }
+
+	    // Send the buffer data to Flight Controller
+	    device->writeStr(buf.str());
+
+        //usleep(microseconds*0.05);
+
+        timer = timer + (difftime(time(NULL),start));
+
+        start =  time(NULL);
+    }
+}
 
 
 /*
@@ -313,72 +323,7 @@ void protocol::msp_command(uint8_t opcode, uint8_t data_length, uint16_t* params
 	
 }
 
-
-void protocol::set_rc(uint8_t opcode, uint8_t ploadsize, uint16_t pload_in[12]){
-    
-    time_t timer = 0;
-
-    time_t start = difftime(time(NULL),0);
-
-    unsigned int microseconds = 1000000;
-
-    while (timer < 0.5){
-
-	    char msp_string[20];
-	    char aggregate[20];
-	    char checksum=0;
-	  
-	    uint8_t msb_pl=0;
-	    uint8_t lsb_pl=1;
-
-	    // Aggregate data
-	    for(int i=0;i<ploadsize;i++){
-	      aggregate[msb_pl]=pload_in[i] & 0xff;
-	      msb_pl=msb_pl+2;
-
-	      aggregate[lsb_pl]=pload_in[i] >> 8;
-	      lsb_pl=lsb_pl+2;
-	    }
-
-	    // Add Size
-	    msp_string[0]=ploadsize*2 & 0xff;
-	    checksum ^= (ploadsize*2 & 0xFF);
-
-	    // Add MSP Command Code
-	    msp_string[1]=opcode & 0xff;
-	    checksum ^= (opcode & 0xFF);
-
-	    // Calculate Checksum
-	    for(int j=0;j<(ploadsize*2);j++){
-	      msp_string[2+j]=aggregate[j] & 0xff;
-	      checksum ^= (aggregate[j] & 0xff);
-	    }
-
-	    // Add Checksum  
-	    msp_string[ploadsize*2+2]= checksum;
-	    
-	    std::ostringstream buf;
-
-	    // Add header to the buffer
-	    buf << to_fc_header;
-
-	    // Add each of byte from string to the buffer
-	    for(int u=0;u<(ploadsize*2+3);u++){
-	    	buf << msp_string[u];
-	    }
-
-	    // Send the buffer data to Flight Controller
-	    device->writeStr(buf.str());
-
-        usleep(microseconds*0.05);
-
-        timer = timer + (difftime(time(NULL),start));
-
-        start =  time(NULL);
-    }
-
-}
-
+/*
 read_frame protocol::read_new(){
 
 	int no_data = 0;
@@ -436,9 +381,8 @@ read_frame protocol::read_new(){
 	} // End while loop
 
 	return r_frame;
-
-
 }
+*/
 
 std::string protocol::read(){
 	// Establish variables for use in receiving data

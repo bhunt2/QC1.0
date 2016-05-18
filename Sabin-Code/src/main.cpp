@@ -88,7 +88,7 @@ int main(int argc, char* argv[]){
 	// Set MSP RC
 	if (strcmp(argv[1], "arm") == 0)
 	{
-		msp_protocol.arm();
+		drone_ctrl.arm();
 
 		//usleep(3*microseconds);
 
@@ -98,7 +98,7 @@ int main(int argc, char* argv[]){
 	// Set MSP RC
 	if (strcmp(argv[1], "disarm") == 0)
 	{
-		msp_protocol.disarm();
+		drone_ctrl.disarm();
 
 		//usleep(3*microseconds);
 
@@ -123,7 +123,7 @@ int main(int argc, char* argv[]){
 		rc.yaw = (uint16_t) strtoul(argv[4], NULL, 0);
 		rc.throttle = (uint16_t) strtoul(argv[5], NULL, 0);
 
-		msp_protocol.set_flight_controls(rc.roll, rc.pitch, rc.yaw, rc.throttle);
+		//drone_ctrl.set_flight_controls(rc.roll, rc.pitch, rc.yaw, rc.throttle);
 
 		//usleep(3*microseconds);
 

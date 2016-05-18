@@ -5,9 +5,14 @@
 #define MSP_FRAMES_H
 
 struct ident_frame {
-	const uint8_t* version; // version of MultiWii
-	const uint8_t* multitype; // type of multi: TRI/QUADP,QUADX,BI,GIMBAL,Y6,HEX6,FLYING_WING,Y4,HEX6X,OCTOX8, OCTOFLATP,OCTOFLATX,AIRPLANE,HELI_120,HELI_90,VTAIL4,HEX6H,SINGLECOPTER,DUALCOPTER
-	const uint32_t* capability; // A 32 bit variable to indicate capability of FC board. (Currently, BIND button is used on first bit, DYNBAL on second, FLAP on third )
+	uint8_t version; // version of MultiWii
+	uint8_t multitype; // type of multi: TRI/QUADP,QUADX,BI,GIMBAL,Y6,HEX6,FLYING_WING,Y4,HEX6X,OCTOX8, OCTOFLATP,OCTOFLATX,AIRPLANE,HELI_120,HELI_90,VTAIL4,HEX6H,SINGLECOPTER,DUALCOPTER
+	//const uint32_t capability; // A 32 bit variable to indicate capability of FC board. (Currently, BIND button is used on first bit, DYNBAL on second, FLAP on third )
+
+	ident_frame():
+	version(0),
+	multitype(0)
+	{}
 };
 
 struct attitude_frame {
@@ -39,10 +44,10 @@ struct set_raw_rc_frame {
 	uint16_t throttle; // 16 bit Range [1000;2000]
 
 	set_raw_rc_frame() :
-		roll(0),
-		pitch(0),
-		yaw(0),
-		throttle(0)
+		roll(1000),
+		pitch(1000),
+		yaw(1000),
+		throttle(1000)
 		{}
 };
 

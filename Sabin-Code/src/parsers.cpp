@@ -14,14 +14,10 @@
 	///////////////////////////////////////////////
 */
 
-	parsers::parsers(){
-
-	}
+	//parsers::parsers(){	}
 
 
-	parsers::~parsers(){
-		
-	}
+	//parsers::~parsers(){}
 
 
 /*
@@ -31,8 +27,12 @@
 */	
 
 
-void parsers::evaluate_identification(std::string data){
-	return;
+ident_frame parsers::evaluate_identification(std::string data){
+	ident_frame ident;
+
+	ident.version = (uint8_t)(strtoul(string_to_hex(data.substr(5,1)).c_str(), NULL, 16));
+
+	return ident;
 
 }
 
