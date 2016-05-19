@@ -139,9 +139,12 @@ void control::move_forward(uint16_t throttle_set_val, uint16_t pitch_set_val){
 }
 
 
-void control::hover(uint16_t max_throttle, int hover_time){
+void control::hover(uint16_t max_throttle, int hover_time, int step){
 
 	set_raw_rc_frame hover_frame;
+
+	hover_frame.yaw = 1500;
+	hover_frame.throttle += 80;
 
 	control_state ctrl_state = ARM;
 
@@ -149,14 +152,9 @@ void control::hover(uint16_t max_throttle, int hover_time){
 
 	uint16_t start_throttle = hover_frame.throttle; // min throttle
 
-	time_t startTime,
-			endTime,
-			currentTime, 
-			elapsedTime;
+	time_t startTime = 0,
+			elapsedTime = 0;
 
-	elapsedTime = 0;
-
-	int step = 5;
 	//parsers parse;
 
 	while(hovering){
@@ -189,26 +187,28 @@ void control::hover(uint16_t max_throttle, int hover_time){
 
 					ctrl_state = INCTHROTTLE;
 				}else{
-					ctrl_state = DECTHROTTLE;
+					ctrl_state = KEEP;
 				}
 
 				break;
 
 			case KEEP:
+				
+				if (startTime == 0){ startTime = time(NULL);}
 
-				for(startTime = time(NULL),endTime = startTime+hover_time; (currentTime = time(NULL)) < endTime;){ 
+				std::cout<<"Hovering for " << hover_time << " seconds" << std::endl; 
 
-					if((currentTime-startTime ) > elapsedTime){ 
+				elapsedTime = time(NULL) - startTime; 
+				
+				if(elapsedTime < hover_time){ 
 
-						set_flight_controls(hover_frame);
+					ctrl_state = KEEP;
 
-						elapsedTime = currentTime - startTime; 
-						
-						std::cout<<"Decreasing Throttle In: " << hover_time - elapsedTime << " seconds" << std::endl; 
-					} 
-				} 
+					set_flight_controls(hover_frame);
 
-				ctrl_state = DECTHROTTLE;
+				} else{
+					ctrl_state = DECTHROTTLE;
+				}
 
 				break;
 

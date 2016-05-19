@@ -62,13 +62,13 @@ int main(int argc, char* argv[]){
 	}
 	else if (strcmp(argv[1], "hover") == 0)
 	{
-		if (argv[2] == NULL || argv[3] == NULL)
+		if (argv[2] == NULL || argv[3] == NULL || argv[3] == NULL)
 		{
-			std::cout << "2 arguments expected! max throttle and time to hover in seconds." << std::endl;
+			std::cout << "3 arguments expected! [max_throtte, hover_time, throttle_step]" << std::endl;
 
 			return 0;
 		}
-		
+
 		SETCMD = HOVER;
 
 	}
@@ -114,8 +114,9 @@ int main(int argc, char* argv[]){
 				
 				uint16_t throttle = (uint16_t) strtoul(argv[2], NULL, 0);
 				int seconds = (int) strtoul(argv[3], NULL, 0);
-				
-				drone_ctrl.hover(throttle, seconds);
+				int step = (int) strtoul(argv[4], NULL, 0);
+
+				drone_ctrl.hover(throttle, seconds, step);
 				break;
 			}
 			

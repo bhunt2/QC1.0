@@ -42,8 +42,8 @@ class control{
 		// -------------- throttle, pitch
 		void move_forward(uint16_t, uint16_t);
 
-		//--------max_throttle, time_to_hover_in_seconds
-		void hover(uint16_t, int);
+		//--------max_throttle, time_to_hover_in_seconds, step value to increase throttle
+		void hover(uint16_t, int, int);
 
 };
 
