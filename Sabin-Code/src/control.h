@@ -19,8 +19,6 @@ class control{
 			DISARM
 		};
 
-		protocol msp_protocol;
-
 		void set_flight_controls(set_raw_rc_frame);
 
 
@@ -29,7 +27,7 @@ class control{
 
 		//~control();
 
-		void get_model();
+		model get_model();
 
 		void arm();
 

@@ -21,90 +21,116 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 
-	control drone_ctrl;
 
-	protocol msp_protocol;
+	enum CMD{
+		ATT,
+		ALT,
+		RCREAD,
+		ARM,
+		DISARM,
+		HOVER,
+		MODELREAD,
+		MODEL,
+		UNKNOWN
+	};
 
-	parsers parse;
+	CMD SETCMD = UNKNOWN;
 
-	// Set MSP RC
-	if (strcmp(argv[1], "hover") == 0)
+	if (strcmp(argv[1], "att") == 0)	
 	{
+		SETCMD = ATT;
 
+	}
+	else if (strcmp(argv[1], "alt") == 0)
+	{
+		SETCMD = ALT;
+
+	}
+	else if (strcmp(argv[1], "rc-read") == 0)
+	{
+		SETCMD = RCREAD;
+		
+	}
+	else if (strcmp(argv[1], "arm") == 0)
+	{
+		SETCMD = ARM;
+
+	}
+	else if (strcmp(argv[1], "disarm") == 0)
+	{
+		SETCMD = DISARM;
+	}
+	else if (strcmp(argv[1], "hover") == 0)
+	{
 		if (argv[2] == NULL || argv[3] == NULL)
 		{
 			std::cout << "2 arguments expected! max throttle and time to hover in seconds." << std::endl;
 
 			return 0;
 		}
-
-		uint16_t throttle = (uint16_t) strtoul(argv[2], NULL, 0);
-		int seconds = (int) strtoul(argv[3], NULL, 0);
 		
-		drone_ctrl.hover(throttle, seconds);
+		SETCMD = HOVER;
 
-		return 0;
+	}
+	else if (strcmp(argv[1], "model") == 0)
+	{
+		SETCMD = MODEL;
+	}
+	else
+	{
+		SETCMD = UNKNOWN;
 	}
 
-	// Read Attitude
-	if (strcmp(argv[1], "att") == 0)	
+
+	parsers parse;
+	control drone_ctrl;
+	protocol msp_protocol;
+
+	switch(SETCMD)
 	{
 
-		 //read_frame read = msp_protocol.request_data_frame(msp_attitude);
+		case ATT:
+			parse.evaluate_attitude(msp_protocol.request_data(msp_attitude));
+			break;
 
-		 //parse.evaluate_attitude(read.payload);
+		case ALT:
+			parse.evaluate_altitude(msp_protocol.request_data(msp_altitude));
+			break;
 
-		std::string response = msp_protocol.request_data(msp_attitude);
+		case RCREAD:
+			parse.evaluate_raw_rc(msp_protocol.request_data(msp_read_rc));
+			break;
 
-		parse.evaluate_attitude(response);
+		case ARM:
+			drone_ctrl.arm();
+			break;
 
-		return 0;
+		case DISARM:
+			drone_ctrl.disarm();
+			break;
+
+		case HOVER:
+			{
+				
+				uint16_t throttle = (uint16_t) strtoul(argv[2], NULL, 0);
+				int seconds = (int) strtoul(argv[3], NULL, 0);
+				
+				drone_ctrl.hover(throttle, seconds);
+				break;
+			}
+			
+		case MODEL:
+			drone_ctrl.get_model();
+			break;
+
+		case UNKNOWN:
+		default:
+			return 0;
+			break;
 	}
 
-	// Read Attitude
-	if (strcmp(argv[1], "alt") == 0)	
-	{
 
-		std::string response = msp_protocol.request_data(msp_altitude);
-
-		parse.evaluate_altitude(response);
-
-		return 0;
-	}
-
-
-	// Read MSP RC
-	if (strcmp(argv[1], "rc-read") == 0)
-	{
-
-		std::string response = msp_protocol.request_data(msp_read_rc);
-		
-		parse.evaluate_raw_rc(response);
-
-		return 0;
-	}
-
-
-	// Set MSP RC
-	if (strcmp(argv[1], "arm") == 0)
-	{
-		drone_ctrl.arm();
-
-		//usleep(3*microseconds);
-
-		return 0;
-	}
-
-	// Set MSP RC
-	if (strcmp(argv[1], "disarm") == 0)
-	{
-		drone_ctrl.disarm();
-
-		//usleep(3*microseconds);
-
-		return 0;
-	}
-
+/*
 	// Set MSP RC
 	if (strcmp(argv[1], "control") == 0)
 	{
@@ -130,6 +156,8 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 
+	
+*/
 
 	return 0;
 	

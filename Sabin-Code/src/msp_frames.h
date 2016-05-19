@@ -4,6 +4,18 @@
 #ifndef MSP_FRAMES_H
 #define MSP_FRAMES_H
 
+struct model{
+	double distance;
+	double speed;
+	double height;
+
+	model():
+	distance(0.0),
+	speed(0.0),
+	height(0.0)
+	{}
+};
+
 struct ident_frame {
 	uint8_t version; // version of MultiWii
 	uint8_t multitype; // type of multi: TRI/QUADP,QUADX,BI,GIMBAL,Y6,HEX6,FLYING_WING,Y4,HEX6X,OCTOX8, OCTOFLATP,OCTOFLATX,AIRPLANE,HELI_120,HELI_90,VTAIL4,HEX6H,SINGLECOPTER,DUALCOPTER
@@ -44,8 +56,8 @@ struct set_raw_rc_frame {
 	uint16_t throttle; // 16 bit Range [1000;2000]
 
 	set_raw_rc_frame() :
-		roll(1000),
-		pitch(1000),
+		roll(1500),
+		pitch(1500),
 		yaw(1000),
 		throttle(1000)
 		{}

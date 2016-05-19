@@ -1,6 +1,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 #include "time.h"
 
@@ -27,6 +28,8 @@
 
 void control::set_flight_controls(set_raw_rc_frame frame){
 
+	protocol msp_protocol;
+
 	// limit to [1000:2000] range
 	if (frame.roll > 2000){frame.roll = 2000;}
 	if (frame.roll < 1000){frame.roll = 1000;}
@@ -52,8 +55,11 @@ void control::set_flight_controls(set_raw_rc_frame frame){
 	///////////////////////////////////////////////
 */
 
-void control::get_model(){
+model control::get_model(){
+
 	std::ifstream infile("model.txt");
+
+	model m;
 
 	if (!infile.good())
 	{
@@ -62,22 +68,24 @@ void control::get_model(){
 			std::cout << "File model.txt is invalid!" << std::endl;
 		}
 
-		return;
+		return m;
 	}
+
+	std::string line;
 
 	while(std::getline(infile, line)){
 
 		std::istringstream iss(line);
 
-	    double distance, speed, height;
-
-	    if (!(iss >> distance >> speed >> height)) { break; } // error
+	    if (!(iss >> m.distance >> m.speed >> m.height)) { break; } // error
 
 	    if (debug)
 	    {
-	    	printf("distance:%fmm speed:%fm/s height:%fmm", distance, speed, height);
+	    	printf("distance:%fmm speed:%fm/s height:%fmm\n", m.distance, m.speed, m.height);
 	    }
 	}
+
+	return m;
 }
 
 void control::arm(){
@@ -86,10 +94,7 @@ void control::arm(){
 
 	set_raw_rc_frame arm_frame;
 
-	arm_frame.roll = 1500;
-	arm_frame.pitch = 1500;
 	arm_frame.yaw = 2000;
-	arm_frame.throttle = 1000;
 
 	set_flight_controls(arm_frame);
 	
@@ -101,9 +106,6 @@ void control::disarm(){
 	std::cout << "\n\nDisArming..." << std::endl;
 	
 	set_raw_rc_frame disarm_frame;
-
-	disarm_frame.roll = 1500;
-	disarm_frame.pitch = 1500;
 
 	set_flight_controls(disarm_frame);
 }
@@ -159,8 +161,11 @@ void control::hover(uint16_t max_throttle, int hover_time){
 
 	while(hovering){
 
-		printf("roll: %u\t pitch: %u\t yaw: %u\t throttle: %u\n", 
+		if (debug)
+		{
+			printf("roll: %u\t pitch: %u\t yaw: %u\t throttle: %u\n", 
 			hover_frame.roll, hover_frame.pitch, hover_frame.yaw, hover_frame.throttle);
+		}
 
 		//parse.evaluate_raw_rc(msp_protocol.request_data(msp_altitude));
 
@@ -169,8 +174,6 @@ void control::hover(uint16_t max_throttle, int hover_time){
 			case ARM:
 
 				arm();
-	
-				usleep(1*microseconds);
 
 				ctrl_state = INCTHROTTLE;
 
