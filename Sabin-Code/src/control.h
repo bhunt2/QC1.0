@@ -29,6 +29,8 @@ class control{
 
 		//~control();
 
+		void get_model();
+
 		void arm();
 
 		void disarm();

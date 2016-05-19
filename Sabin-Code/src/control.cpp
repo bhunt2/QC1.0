@@ -1,5 +1,5 @@
 
-//#include <stdio.h>
+#include <fstream>
 #include <iostream>
 
 #include "time.h"
@@ -52,6 +52,33 @@ void control::set_flight_controls(set_raw_rc_frame frame){
 	///////////////////////////////////////////////
 */
 
+void control::get_model(){
+	std::ifstream infile("model.txt");
+
+	if (!infile.good())
+	{
+		if (debug)
+		{
+			std::cout << "File model.txt is invalid!" << std::endl;
+		}
+
+		return;
+	}
+
+	while(std::getline(infile, line)){
+
+		std::istringstream iss(line);
+
+	    double distance, speed, height;
+
+	    if (!(iss >> distance >> speed >> height)) { break; } // error
+
+	    if (debug)
+	    {
+	    	printf("distance:%fmm speed:%fm/s height:%fmm", distance, speed, height);
+	    }
+	}
+}
 
 void control::arm(){
 
