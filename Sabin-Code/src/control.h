@@ -15,6 +15,7 @@ class control{
 			ARM,
 			INCTHROTTLE,
 			KEEP,
+			HOLD,
 			DECTHROTTLE,
 			DISARM
 		};

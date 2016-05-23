@@ -1,4 +1,5 @@
 #include <unistd.h>
+#include <stdio.h>
 #include <iostream>
 #include <exception>
 
@@ -10,7 +11,6 @@
 
 
 int main(int argc, char* argv[]){
-
 
 	std::cout << "Debug is =>" << debug << std::endl;
 
@@ -26,11 +26,13 @@ int main(int argc, char* argv[]){
 		ATT,
 		ALT,
 		RCREAD,
+		IDENT,
 		ARM,
 		DISARM,
 		HOVER,
 		MODELREAD,
 		MODEL,
+		THROTTLE,
 		UNKNOWN
 	};
 
@@ -49,6 +51,11 @@ int main(int argc, char* argv[]){
 	else if (strcmp(argv[1], "rc-read") == 0)
 	{
 		SETCMD = RCREAD;
+		
+	}
+	else if (strcmp(argv[1], "ident") == 0)
+	{
+		SETCMD = IDENT;
 		
 	}
 	else if (strcmp(argv[1], "arm") == 0)
@@ -76,6 +83,10 @@ int main(int argc, char* argv[]){
 	{
 		SETCMD = MODEL;
 	}
+	else if(strcmp(argv[1], "throttle") == 0)
+	{
+		SETCMD = THROTTLE;
+	}
 	else
 	{
 		SETCMD = UNKNOWN;
@@ -84,7 +95,9 @@ int main(int argc, char* argv[]){
 
 	parsers parse;
 	control drone_ctrl;
-	protocol msp_protocol;
+	protocol msp_protocol(false);
+
+	//sbool in_test = false;
 
 	switch(SETCMD)
 	{
@@ -94,11 +107,30 @@ int main(int argc, char* argv[]){
 			break;
 
 		case ALT:
-			parse.evaluate_altitude(msp_protocol.request_data(msp_altitude));
+		{
+
+			int target_alt = 200; // 2 cmd
+
+			while(true){
+				altitude_frame alt_f = parse.evaluate_altitude(msp_protocol.request_data(msp_altitude));
+				
+				printf("target_alt=%d cm\t curr_alt=%d cm\n", target_alt, alt_f.est_alt);
+				if (target_alt == alt_f.est_alt)
+				{
+					break;
+				}
+				usleep(1*microseconds);
+			}
+		}
+			
 			break;
 
 		case RCREAD:
 			parse.evaluate_raw_rc(msp_protocol.request_data(msp_read_rc));
+			break;
+		
+		case IDENT:
+			parse.evaluate_identification(msp_protocol.request_data(msp_ident));
 			break;
 
 		case ARM:
@@ -122,6 +154,47 @@ int main(int argc, char* argv[]){
 			
 		case MODEL:
 			drone_ctrl.get_model();
+			break;
+
+		case THROTTLE:
+			//in_test = true;
+			
+			/*{
+
+				uint16_t throttle = 1000;
+
+				throttle += 95;
+
+				int c;
+				system("/bin/stty raw");
+
+				drone_ctrl.arm();
+				
+				while((c=getchar()) != '.')
+				{
+
+					drone_ctrl.throttle(throttle);
+
+					putchar(c);
+
+					if (c == 'w')
+					{
+						throttle += 1;
+						drone_ctrl.throttle(throttle);
+					}
+
+					if (c == 's')
+					{
+						throttle -= 1;
+						drone_ctrl.throttle(throttle);
+					}
+
+				}
+
+				system("/bin/stty cooked");
+
+			}*/
+
 			break;
 
 		case UNKNOWN:

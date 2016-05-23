@@ -32,6 +32,13 @@ ident_frame parsers::evaluate_identification(std::string data){
 
 	ident.version = (uint8_t)(strtoul(string_to_hex(data.substr(5,1)).c_str(), NULL, 16));
 
+	if(debug){
+
+		std::cout << "Response: " << data << "\n" << std::endl;
+
+		printf("version: %d\n", ident.version);
+	}
+	
 	return ident;
 
 }
@@ -124,11 +131,11 @@ altitude_frame parsers::evaluate_altitude(std::string rx_frame){
 	temp.clear();
 
 
-	if(debug){
+	if(debug){ 
 
 		std::cout << "Response: " << rx_frame << "\n" << std::endl;
 
-		printf("est altitude: %d \tVario: %d\n", alt_frame.est_alt, alt_frame.vario);
+		printf("est altitude: %d cm \tVario: %d cm/s\n", alt_frame.est_alt, alt_frame.vario);
 	}
 
 	return alt_frame;

@@ -28,8 +28,6 @@
 
 void control::set_flight_controls(set_raw_rc_frame frame){
 
-	protocol msp_protocol;
-
 	// limit to [1000:2000] range
 	if (frame.roll > 2000){frame.roll = 2000;}
 	if (frame.roll < 1000){frame.roll = 1000;}
@@ -42,9 +40,11 @@ void control::set_flight_controls(set_raw_rc_frame frame){
 
 	uint8_t payload_size = 8;
 
-	uint16_t payload[payload_size] = {frame.roll, frame.pitch, frame.yaw, frame.throttle, 0, 0, 0, 0};
+	uint16_t payload[payload_size] = {frame.roll, frame.pitch, frame.yaw, frame.throttle, frame.aux1, 0, 0, 0};
 	
-	msp_protocol.set_rc(msp_set_raw_rc, payload_size, payload);
+	protocol p(false);
+	
+	p.set_rc(msp_set_raw_rc, payload_size, payload);
 
 }
 
@@ -142,9 +142,9 @@ void control::move_forward(uint16_t throttle_set_val, uint16_t pitch_set_val){
 void control::hover(uint16_t max_throttle, int hover_time, int step){
 
 	set_raw_rc_frame hover_frame;
-
+	set_raw_rc_frame alt_hold;
 	hover_frame.yaw = 1500;
-	hover_frame.throttle += 80;
+	hover_frame.throttle += 110;
 
 	control_state ctrl_state = ARM;
 
@@ -156,16 +156,9 @@ void control::hover(uint16_t max_throttle, int hover_time, int step){
 			elapsedTime = 0;
 
 	//parsers parse;
-
+	//protocol p(false);
+ 
 	while(hovering){
-
-		if (debug)
-		{
-			printf("roll: %u\t pitch: %u\t yaw: %u\t throttle: %u\n", 
-			hover_frame.roll, hover_frame.pitch, hover_frame.yaw, hover_frame.throttle);
-		}
-
-		//parse.evaluate_raw_rc(msp_protocol.request_data(msp_altitude));
 
 		switch(ctrl_state){
 
@@ -180,16 +173,23 @@ void control::hover(uint16_t max_throttle, int hover_time, int step){
 			case INCTHROTTLE:
 
 				hover_frame.throttle += step;
-
 				if (hover_frame.throttle < max_throttle)
 				{
+					
 					set_flight_controls(hover_frame);
 
 					ctrl_state = INCTHROTTLE;
 				}else{
-					ctrl_state = KEEP;
+					ctrl_state = HOLD;
 				}
 
+				break;
+
+			case HOLD:
+				alt_hold.yaw = 1500;
+				alt_hold.aux1 = 1500;
+				set_flight_controls(alt_hold);
+				ctrl_state = HOLD;
 				break;
 
 			case KEEP:
@@ -241,7 +241,8 @@ void control::hover(uint16_t max_throttle, int hover_time, int step){
 				break;
 
 		} // end switch
-
+		//parse.evaluate_raw_rc(p.request_data(msp_altitude));
+		//usleep(300);
 	} // end while
 }
 

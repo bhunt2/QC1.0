@@ -13,10 +13,12 @@
 	///////////////////////////////////////////////
 */
 
-protocol::protocol(){
+protocol::protocol(bool protocol_debug){
 	setup_uart();
 
 	curr_state = start;
+
+	internal_debug = protocol_debug;
 }
 
 protocol::~protocol(){
@@ -290,7 +292,7 @@ void protocol::msp_command(uint8_t opcode, uint8_t data_length, uint16_t* params
 	// Send packed frame
     device->writeStr(frame_string);
 
-	if(debug == 1)
+	if(debug == 1 && internal_debug)
 	{
 		std::cout << "\n\n\t\t" << "Header\t     Size\t      Command\t       CRC\n";
 		std::cout << "Sending Frame:\t";
@@ -401,7 +403,7 @@ std::string protocol::read(){
 			// Get known frame size back for now
 			buf.append(device->readStr(1));
 			
-			if(debug == 1)
+			if(debug == 1 && internal_debug)
 			{
 				// State data is available only on the first byte
 				if(bytes_ctr == 0)
@@ -428,7 +430,7 @@ std::string protocol::read(){
 		}
 	}while(to_counter < 1000);
 	
-	if(debug == 1)
+	if(debug == 1 && internal_debug)
 	{
 		std::cout << "Number of bytes received: " << bytes_ctr << std::endl;
 	}
