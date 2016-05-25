@@ -1,0 +1,675 @@
+root@AutonomousDrone:~/Drone/src# ./drone alt
+Debug is =>1
+Initializing UART...
+Setting Baudrate to 115200...
+Setting Mode to 801...
+Setting Flow Control: xonxoff->0 rtscts->0...
+Device Path: /dev/ttyMFD1
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mD▒▒▒▒
+
+est altitude: -188 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mF▒▒▒▒
+
+est altitude: -186 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mQ▒▒▒▒
+
+est altitude: -175 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mO▒▒▒▒
+
+est altitude: -177 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mh▒▒▒▒
+
+est altitude: -152 cm   Vario: 6 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mf▒▒▒▒
+
+est altitude: -154 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mb▒▒▒▒
+
+est altitude: -158 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mh▒▒▒▒
+
+est altitude: -152 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mf▒▒▒▒
+
+est altitude: -154 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mX▒▒▒▒
+
+est altitude: -168 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mX▒▒▒▒
+
+est altitude: -168 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mR▒▒▒▒
+
+est altitude: -174 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m\▒▒▒▒
+
+est altitude: -164 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mE▒▒▒▒▒▒
+
+est altitude: -187 cm   Vario: -1 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mB▒▒▒▒
+
+est altitude: -190 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mR▒▒▒▒
+
+est altitude: -174 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mc▒▒▒▒
+
+est altitude: -157 cm   Vario: 3 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mV▒▒▒▒
+
+est altitude: -170 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mh▒▒▒▒
+
+est altitude: -152 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mT▒▒▒▒
+
+est altitude: -172 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mJ▒▒▒▒
+
+est altitude: -182 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mO▒▒▒▒
+
+est altitude: -177 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mT▒▒▒▒
+
+est altitude: -172 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>ma▒▒▒▒
+
+est altitude: -159 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mT▒▒▒▒
+
+est altitude: -172 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m9▒▒▒▒▒▒
+
+est altitude: -199 cm   Vario: -4 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m\▒▒▒▒
+
+est altitude: -164 cm   Vario: 2 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mS▒▒▒▒
+
+est altitude: -173 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mU▒▒▒▒
+
+est altitude: -171 cm   Vario: 0 cm/s
+^C
+root@AutonomousDrone:~/Drone/src# ./drone alt
+Debug is =>1
+Initializing UART...
+Setting Baudrate to 115200...
+Setting Mode to 801...
+Setting Flow Control: xonxoff->0 rtscts->0...
+Device Path: /dev/ttyMFD1
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mF▒▒▒▒
+
+est altitude: -186 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mR▒▒▒▒
+
+est altitude: -174 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m`▒▒▒▒
+
+est altitude: -160 cm   Vario: 4 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mL▒▒▒▒
+
+est altitude: -180 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m]▒▒▒▒
+
+est altitude: -163 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mZ▒▒▒▒
+
+est altitude: -166 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m(▒▒▒▒▒▒
+
+est altitude: -216 cm   Vario: -12 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m)▒▒▒▒▒▒
+
+est altitude: -215 cm   Vario: -4 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m2▒▒▒▒
+
+est altitude: -206 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m.▒▒▒▒
+
+est altitude: -210 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m)▒▒▒▒
+
+est altitude: -215 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m/▒▒▒▒
+
+est altitude: -209 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m$▒▒▒▒
+
+est altitude: -220 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m1▒▒▒▒
+
+est altitude: -207 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m5▒▒▒▒
+
+est altitude: -203 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mC▒▒▒▒
+
+est altitude: -189 cm   Vario: 4 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m7▒▒▒▒
+
+est altitude: -201 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m.▒▒▒▒
+
+est altitude: -210 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m/▒▒▒▒
+
+est altitude: -209 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mB▒▒▒▒
+
+est altitude: -190 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m5▒▒▒▒
+
+est altitude: -203 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m)▒▒▒▒
+
+est altitude: -215 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mU▒▒▒      ▒
+
+est altitude: -171 cm   Vario: 9 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mD▒▒▒▒
+
+est altitude: -188 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mU▒▒▒▒
+
+est altitude: -171 cm   Vario: 2 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m]▒▒▒▒
+
+est altitude: -163 cm   Vario: 2 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mY▒▒▒▒
+
+est altitude: -167 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mR▒▒▒▒
+
+est altitude: -174 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mb▒▒▒▒
+
+est altitude: -158 cm   Vario: 1 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mA▒▒▒▒▒▒
+
+est altitude: -191 cm   Vario: -5 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mJ▒▒▒▒
+
+est altitude: -182 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mK▒▒▒▒
+
+est altitude: -181 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mL▒▒▒▒
+
+est altitude: -180 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mE▒▒▒▒
+
+est altitude: -187 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mE▒▒▒▒
+
+est altitude: -187 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m1▒▒▒▒▒▒
+
+est altitude: -207 cm   Vario: -3 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mF▒▒▒▒
+
+est altitude: -186 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m2▒▒▒▒
+
+est altitude: -206 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mK▒▒▒▒
+
+est altitude: -181 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mI▒▒▒▒
+
+est altitude: -183 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mF▒▒▒▒
+
+est altitude: -186 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m5▒▒▒▒
+
+est altitude: -203 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m"▒▒▒▒▒▒
+
+est altitude: -222 cm   Vario: -4 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m"▒▒▒▒
+
+est altitude: -222 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m0▒▒▒▒
+
+est altitude: -208 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mH▒▒▒▒
+
+est altitude: -184 cm   Vario: 4 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mD▒▒▒▒
+
+est altitude: -188 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m^▒▒▒▒
+
+est altitude: -162 cm   Vario: 7 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mi▒▒▒▒
+
+est altitude: -151 cm   Vario: 5 cm/s
+PuTTYSending Command: m
+No Serial Data Available.
+
+Response: $M>ma▒▒▒▒
+
+est altitude: -159 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mX▒▒▒▒
+
+est altitude: -168 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mR▒▒▒▒
+
+est altitude: -174 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mK▒▒▒▒
+
+est altitude: -181 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mY▒▒▒▒
+
+est altitude: -167 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mp▒▒▒▒
+
+est altitude: -144 cm   Vario: 5 cm/s
+PuTTYSending Command: m
+No Serial Data Available.
+
+Response: $M>mi▒▒▒▒
+
+est altitude: -151 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mm▒▒▒▒
+
+est altitude: -147 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mb▒▒▒▒
+
+est altitude: -158 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>md▒▒▒▒
+
+est altitude: -156 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mg▒▒▒▒
+
+est altitude: -153 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mU▒▒▒▒
+
+est altitude: -171 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mc▒▒▒▒
+
+est altitude: -157 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m\▒▒▒▒
+
+est altitude: -164 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m^▒▒▒▒
+
+est altitude: -162 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m^▒▒▒▒
+
+est altitude: -162 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mP▒▒▒▒
+
+est altitude: -176 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>ma▒▒▒▒
+
+est altitude: -159 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mf▒▒▒▒
+
+est altitude: -154 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mW▒▒▒▒
+
+est altitude: -169 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mQ▒▒▒▒
+
+est altitude: -175 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mb▒▒▒▒
+
+est altitude: -158 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mS▒▒▒▒
+
+est altitude: -173 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mA▒▒▒▒▒▒
+
+est altitude: -191 cm   Vario: -3 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mD▒▒▒▒▒▒
+
+est altitude: -188 cm   Vario: -2 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m8▒▒▒▒▒▒
+
+est altitude: -200 cm   Vario: -3 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>m=▒▒▒▒
+
+est altitude: -195 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mA▒▒▒▒
+
+est altitude: -191 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mN▒▒▒▒
+
+est altitude: -178 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mM▒▒▒▒
+
+est altitude: -179 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mF▒▒▒▒
+
+est altitude: -186 cm   Vario: 0 cm/s
+Sending Command: m
+No Serial Data Available.
+
+Response: $M>mY▒▒▒▒
+
+est altitude: -167 cm   Vario: 1 cm/s
