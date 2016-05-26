@@ -46,8 +46,6 @@ read_frame protocol::request_data_frame(uint8_t opcode){
 // and reads the response back
 std::string protocol::request_data(uint8_t opcode){
 
-	std::cout << "Sending Command: " << opcode << std::endl;
-
 	msp_request(opcode);
 
 	usleep(500);
@@ -60,8 +58,6 @@ std::string protocol::request_data(uint8_t opcode){
 // Sends the parameter to the Flight controller w/ command code
 // and reads the response back
 std::string protocol::request_data(uint8_t opcode, uint8_t param_length, uint16_t* params){
-
-	std::cout << "Sending Command: " << opcode << std::endl;
 
 	msp_command(opcode, param_length, params);
 
@@ -145,31 +141,38 @@ void protocol::set_rc(uint8_t opcode, uint8_t ploadsize, uint16_t pload_in[12]){
 
 void protocol::setup_uart(){
 	try {
-		std::cout << "Initializing UART..." << std::endl;
+
 		device = new mraa::Uart(0);
+		
+		if (debug)
+		{
+			std::cout << "Initializing UART..." << std::endl;
+			std::cout << "Setting Baudrate to " << uartsetup.baudrate << "..." << std::endl;
+			std::cout << "Setting Mode to " << uartsetup.mode_byte_size << uartsetup.mode_parity << uartsetup.mode_stop_bits << "..." << std::endl;	
+			std::cout << "Setting Flow Control: xonxoff->" << uartsetup.xon_xoff << " rtscts->" << uartsetup.rts_cts << "..." << std::endl;
+			std::cout << "Device Path: " << device->getDevicePath() << std::endl;
+		}
 
 		if (device->setBaudRate(uartsetup.baudrate) != mraa::SUCCESS) {
-		std::cout << "Error setting parity on UART" << std::endl;
-		}
-		else{
-			std::cout << "Setting Baudrate to " << uartsetup.baudrate << "..." << std::endl;
+			if (debug)
+			{
+				std::cout << "Error setting parity on UART" << std::endl;
+			}
 		}
 
 		if (device->setMode(uartsetup.mode_byte_size, uartsetup.mode_parity, uartsetup.mode_stop_bits) != mraa::SUCCESS) {
-			std::cout << "Error setting parity on UART" << std::endl;
-		}
-		else{
-			std::cout << "Setting Mode to " << uartsetup.mode_byte_size << uartsetup.mode_parity << uartsetup.mode_stop_bits << "..." << std::endl;
+			if (debug)
+			{
+				std::cout << "Error setting parity on UART" << std::endl;
+			}
 		}
 
 		if (device->setFlowcontrol(uartsetup.xon_xoff, uartsetup.rts_cts) != mraa::SUCCESS) {
-			std::cout << "Error setting flow control UART" << std::endl;
+			if (debug)
+			{
+				std::cout << "Error setting flow control UART" << std::endl;
+			}
 		}
-		else{
-			std::cout << "Setting Flow Control: xonxoff->" << uartsetup.xon_xoff << " rtscts->" << uartsetup.rts_cts << "..." << std::endl;
-		}
-
-		std::cout << "Device Path: " << device->getDevicePath() << std::endl;
 	}
 	catch (std::exception& e) {
 		std::cout << e.what() << ", likely invalid platform config" << std::endl;
@@ -177,6 +180,11 @@ void protocol::setup_uart(){
 }
 
 void protocol::msp_request(uint8_t opcode){
+
+	if (debug)
+	{
+		printf("Sending Command=>%d\n", opcode);
+	}
 
 	char msp_string[20];
 

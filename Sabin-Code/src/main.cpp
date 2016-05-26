@@ -2,13 +2,18 @@
 #include <stdio.h>
 #include <iostream>
 #include <exception>
+#include <termios.h>
+#include <fcntl.h>
 
 #include "msp_frames.h"
 #include "types.h"
-#include "parsers.h"
-#include "protocol.h"
+#include "request.h"
 #include "control.h"
 
+void throttle_test();
+
+request read_me;
+control drone_ctrl;
 
 int main(int argc, char* argv[]){
 
@@ -92,33 +97,32 @@ int main(int argc, char* argv[]){
 		SETCMD = UNKNOWN;
 	}
 
-
-	parsers parse;
-	control drone_ctrl;
-	protocol msp_protocol(false);
-
-	//sbool in_test = false;
-
 	switch(SETCMD)
 	{
+		
+		case IDENT:
+			read_me.request_ident();
+
+			break;
 
 		case ATT:
-			parse.evaluate_attitude(msp_protocol.request_data(msp_attitude));
+			read_me.request_attitude();
 			break;
 
 		case ALT:
 		{
 
-			int target_alt = 200; // 2 cmd
+			//int target_alt = 200; // 2 cmd
 
 			while(true){
-				altitude_frame alt_f = parse.evaluate_altitude(msp_protocol.request_data(msp_altitude));
-				
+				read_me.request_altitude();
+				/*
+				altitude_frame alt_f = 
 				printf("target_alt=%d cm\t curr_alt=%d cm\n", target_alt, alt_f.est_alt);
 				if (target_alt == alt_f.est_alt)
 				{
 					break;
-				}
+				}*/
 				usleep(1*microseconds);
 			}
 		}
@@ -126,11 +130,7 @@ int main(int argc, char* argv[]){
 			break;
 
 		case RCREAD:
-			parse.evaluate_raw_rc(msp_protocol.request_data(msp_read_rc));
-			break;
-		
-		case IDENT:
-			parse.evaluate_identification(msp_protocol.request_data(msp_ident));
+			read_me.request_rc_values();
 			break;
 
 		case ARM:
@@ -143,7 +143,8 @@ int main(int argc, char* argv[]){
 
 		case HOVER:
 			{
-				
+				control drone_ctrl;
+
 				uint16_t throttle = (uint16_t) strtoul(argv[2], NULL, 0);
 				int seconds = (int) strtoul(argv[3], NULL, 0);
 				int step = (int) strtoul(argv[4], NULL, 0);
@@ -153,48 +154,13 @@ int main(int argc, char* argv[]){
 			}
 			
 		case MODEL:
+			control drone_ctrl;
 			drone_ctrl.get_model();
 			break;
 
 		case THROTTLE:
-			//in_test = true;
-			
-			/*{
 
-				uint16_t throttle = 1000;
-
-				throttle += 95;
-
-				int c;
-				system("/bin/stty raw");
-
-				drone_ctrl.arm();
-				
-				while((c=getchar()) != '.')
-				{
-
-					drone_ctrl.throttle(throttle);
-
-					putchar(c);
-
-					if (c == 'w')
-					{
-						throttle += 1;
-						drone_ctrl.throttle(throttle);
-					}
-
-					if (c == 's')
-					{
-						throttle -= 1;
-						drone_ctrl.throttle(throttle);
-					}
-
-				}
-
-				system("/bin/stty cooked");
-
-			}*/
-
+			throttle_test();
 			break;
 
 		case UNKNOWN:
@@ -203,36 +169,75 @@ int main(int argc, char* argv[]){
 			break;
 	}
 
-
-/*
-	// Set MSP RC
-	if (strcmp(argv[1], "control") == 0)
-	{
-
-		if (argv[2] == NULL || argv[3] == NULL || argv[4] == NULL || argv[5] == NULL)
-		{
-			std::cout << "4 arguments expected! [Roll Pitch Yaw Throttle]" << std::endl;
-
-			return 0;
-		}
-
-		set_raw_rc_frame rc;
-
-		rc.roll = (uint16_t) strtoul(argv[2], NULL, 0);
-		rc.pitch = (uint16_t) strtoul(argv[3], NULL, 0);
-		rc.yaw = (uint16_t) strtoul(argv[4], NULL, 0);
-		rc.throttle = (uint16_t) strtoul(argv[5], NULL, 0);
-
-		//drone_ctrl.set_flight_controls(rc.roll, rc.pitch, rc.yaw, rc.throttle);
-
-		//usleep(3*microseconds);
-
-		return 0;
-	}
-
-	
-*/
-
 	return 0;
 	
+}
+
+void throttle_test(){
+
+	control drone_ctrl;
+
+	uint16_t throttle = 1100;
+	
+	bool armed = false;
+
+	struct termios oldSettings, newSettings;
+
+    tcgetattr( fileno( stdin ), &oldSettings );
+    newSettings = oldSettings;
+    newSettings.c_lflag &= (~ICANON & ~ECHO);
+    tcsetattr( fileno( stdin ), TCSANOW, &newSettings );    
+	char c;
+    while (1)
+    {
+    	if (!armed)
+    	{
+    		drone_ctrl.arm();
+    		armed = true;
+    	}else{
+    		printf("\n\n****throttle: %d****\n\n", throttle);
+			drone_ctrl.throttle(throttle);
+    	}
+    	
+        fd_set set;
+        struct timeval tv;
+
+        tv.tv_sec = 0;
+        tv.tv_usec = 0;
+
+        FD_ZERO( &set );
+        FD_SET( fileno( stdin ), &set );
+
+        int res = select( fileno( stdin )+1, &set, NULL, NULL, &tv );
+
+        if( res > 0 )
+        {
+            
+            read( fileno( stdin ), &c, 1 );
+
+            if (c == 'w')
+			{
+				throttle += 1;
+				drone_ctrl.throttle(throttle);
+			}
+
+			if (c == 's')
+			{
+				throttle -= 1;
+				drone_ctrl.throttle(throttle);
+			}
+			if (c == 'x')
+			{
+				drone_ctrl.disarm();
+				break;
+			}
+        }
+        else if( res < 0 )
+        {
+            perror( "select error" );
+            break;
+        } 
+    }
+
+    tcsetattr( fileno( stdin ), TCSANOW, &oldSettings );
 }

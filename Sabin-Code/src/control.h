@@ -9,7 +9,6 @@
 
 class control{
 	private:
-
 		enum control_state{
 			START,
 			ARM,
@@ -20,7 +19,7 @@ class control{
 			DISARM
 		};
 
-		void set_flight_controls(set_raw_rc_frame);
+		void set_flight_controls(raw_rc_frame);
 
 
 	public:

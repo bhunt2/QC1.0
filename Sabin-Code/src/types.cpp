@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-bool debug = true;
+bool debug = false;
 
 unsigned int microseconds = 1000000;
 

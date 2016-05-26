@@ -118,6 +118,7 @@ altitude_frame parsers::evaluate_altitude(std::string rx_frame){
 	temp.append(string_to_hex(rx_frame.substr(6,1)));
 	temp.append(string_to_hex(rx_frame.substr(5,1)));
 
+
 	alt_frame.est_alt = ((uint32_t)(strtoul(temp.c_str(), NULL, 16)));
 
 	temp.clear();
@@ -141,9 +142,9 @@ altitude_frame parsers::evaluate_altitude(std::string rx_frame){
 	return alt_frame;
 }
 
-set_raw_rc_frame parsers::evaluate_raw_rc(std::string rx_frame){
+raw_rc_frame parsers::evaluate_raw_rc(std::string rx_frame){
 
-	set_raw_rc_frame rc;
+	raw_rc_frame rc;
 
 	if (rx_frame.empty())
 	{

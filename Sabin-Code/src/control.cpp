@@ -26,7 +26,7 @@
 	///////////////////////////////////////////////
 */
 
-void control::set_flight_controls(set_raw_rc_frame frame){
+void control::set_flight_controls(raw_rc_frame frame){
 
 	// limit to [1000:2000] range
 	if (frame.roll > 2000){frame.roll = 2000;}
@@ -42,10 +42,9 @@ void control::set_flight_controls(set_raw_rc_frame frame){
 
 	uint16_t payload[payload_size] = {frame.roll, frame.pitch, frame.yaw, frame.throttle, frame.aux1, 0, 0, 0};
 	
-	protocol p(false);
-	
-	p.set_rc(msp_set_raw_rc, payload_size, payload);
+	protocol msp_protocol(false);
 
+	msp_protocol.set_rc(msp_set_raw_rc, payload_size, payload);
 }
 
 
@@ -92,7 +91,7 @@ void control::arm(){
 
 	std::cout << "\nArming..." << std::endl;
 
-	set_raw_rc_frame arm_frame;
+	raw_rc_frame arm_frame;
 
 	arm_frame.yaw = 2000;
 
@@ -105,7 +104,7 @@ void control::disarm(){
 
 	std::cout << "\n\nDisArming..." << std::endl;
 	
-	set_raw_rc_frame disarm_frame;
+	raw_rc_frame disarm_frame;
 
 	set_flight_controls(disarm_frame);
 }
@@ -122,15 +121,15 @@ void control::follow(float distance, float speed, float height){
 
 
 void control::throttle(uint16_t throttle_set_val){
-	set_raw_rc_frame a_frame;
-
+	raw_rc_frame a_frame;
+	a_frame.yaw = 1500;
 	a_frame.throttle = throttle_set_val;
 
 	set_flight_controls(a_frame);
 }
 
 void control::move_forward(uint16_t throttle_set_val, uint16_t pitch_set_val){
-	set_raw_rc_frame move_frame;
+	raw_rc_frame move_frame;
 
 	move_frame.throttle = throttle_set_val;
 	move_frame.pitch = pitch_set_val;
@@ -141,8 +140,8 @@ void control::move_forward(uint16_t throttle_set_val, uint16_t pitch_set_val){
 
 void control::hover(uint16_t max_throttle, int hover_time, int step){
 
-	set_raw_rc_frame hover_frame;
-	set_raw_rc_frame alt_hold;
+	raw_rc_frame hover_frame;
+	raw_rc_frame alt_hold;
 	hover_frame.yaw = 1500;
 	hover_frame.throttle += 110;
 
@@ -186,6 +185,7 @@ void control::hover(uint16_t max_throttle, int hover_time, int step){
 				break;
 
 			case HOLD:
+				std::cout << "Holding Altitude..... " << std::endl;
 				alt_hold.yaw = 1500;
 				alt_hold.aux1 = 1500;
 				set_flight_controls(alt_hold);

@@ -11,8 +11,8 @@ GGDB=-ggdb
 all: drone
 
 # Create drone object executable
-drone: main.o protocol.o control.o parsers.o types.o
-	$(CC) $(MRAALIB) main.o protocol.o control.o parsers.o types.o -o drone
+drone: main.o protocol.o control.o request.o parsers.o types.o
+	$(CC) $(MRAALIB) main.o protocol.o control.o request.o parsers.o types.o -o drone
 
 # Create main object
 main.o: main.cpp
@@ -25,6 +25,10 @@ protocol.o: protocol.cpp
 # Create Control object
 control.o: control.cpp
 	$(CC) $(CFLAGS) $(GGDB) -c control.cpp
+
+# Create Request object
+request.o: request.cpp
+	$(CC) $(CFLAGS) $(GGDB) -c request.cpp
 
 # Create parsers object
 parsers.o: parsers.cpp

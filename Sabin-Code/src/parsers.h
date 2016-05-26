@@ -1,8 +1,8 @@
 
+#include "msp_frames.h"
+
 #ifndef PARSERS_H
 #define PARSERS_H
-
-#include "msp_frames.h"
 
 class parsers
 {
@@ -26,7 +26,7 @@ class parsers
 		ident_frame evaluate_identification(std::string);
 
 		//This method takes in the raw data returned from the flight controller and parses it to give the rc values roll, pitch, yaw and throttle
-		set_raw_rc_frame evaluate_raw_rc(std::string);
+		raw_rc_frame evaluate_raw_rc(std::string);
 };
 
 #endif
