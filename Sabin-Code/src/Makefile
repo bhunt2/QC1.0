@@ -3,7 +3,7 @@ CC=g++
 
 CFLAGS=-c -Wall
 
-MRAALIB= -lmraa
+LIBS= -lmraa -lncurses -ltinfo
 
 GGDB=-ggdb
 
@@ -12,7 +12,7 @@ all: drone
 
 # Create drone object executable
 drone: main.o protocol.o control.o request.o parsers.o types.o
-	$(CC) $(MRAALIB) main.o protocol.o control.o request.o parsers.o types.o -o drone
+	$(CC) $(LIBS) main.o protocol.o control.o request.o parsers.o types.o -o drone
 
 # Create main object
 main.o: main.cpp

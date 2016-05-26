@@ -4,6 +4,7 @@
 #include <exception>
 #include <termios.h>
 #include <fcntl.h>
+#include <curses.h>
 
 #include "msp_frames.h"
 #include "types.h"
@@ -16,7 +17,7 @@ request read_me;
 control drone_ctrl;
 
 int main(int argc, char* argv[]){
-
+	
 	std::cout << "Debug is =>" << debug << std::endl;
 
 	if (argc <= 1)
@@ -179,15 +180,57 @@ void throttle_test(){
 
 	uint16_t throttle = 1100;
 	
-	bool armed = false;
+	int c;
+	nodelay(stdscr, TRUE);
+	initscr();
+	cbreak();
+  	timeout(0);
 
+  	drone_ctrl.arm();
+ 
+	for (;;) {
+
+		c = getch();
+
+	 	printf("\n\n****throttle: %d****\n\n", throttle);
+		drone_ctrl.throttle(throttle);
+
+	 	if (c == 'w')
+		{
+			throttle += 1;
+			drone_ctrl.throttle(throttle);
+		}
+
+		if (c == 's')
+		{
+			throttle -= 1;
+			drone_ctrl.throttle(throttle);
+		}
+
+		if (c == 'x')
+		{
+			drone_ctrl.disarm();
+			break;
+		}
+	}
+
+	endwin();
+
+/*
 	struct termios oldSettings, newSettings;
 
     tcgetattr( fileno( stdin ), &oldSettings );
     newSettings = oldSettings;
     newSettings.c_lflag &= (~ICANON & ~ECHO);
-    tcsetattr( fileno( stdin ), TCSANOW, &newSettings );    
+    tcsetattr( fileno( stdin ), TCSANOW, &newSettings );
+
 	char c;
+	fd_set set;
+    struct timeval tv;
+
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+
     while (1)
     {
     	if (!armed)
@@ -198,12 +241,6 @@ void throttle_test(){
     		printf("\n\n****throttle: %d****\n\n", throttle);
 			drone_ctrl.throttle(throttle);
     	}
-    	
-        fd_set set;
-        struct timeval tv;
-
-        tv.tv_sec = 0;
-        tv.tv_usec = 0;
 
         FD_ZERO( &set );
         FD_SET( fileno( stdin ), &set );
@@ -240,4 +277,5 @@ void throttle_test(){
     }
 
     tcsetattr( fileno( stdin ), TCSANOW, &oldSettings );
+    */
 }
