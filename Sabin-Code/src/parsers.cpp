@@ -35,10 +35,10 @@ ident_frame parsers::evaluate_identification(std::string data){
 	if(debug){
 
 		std::cout << "Response: " << data << "\n" << std::endl;
-
-		printf("version: %d\n", ident.version);
 	}
 	
+	printf("version: %d\n", ident.version);
+
 	return ident;
 
 }

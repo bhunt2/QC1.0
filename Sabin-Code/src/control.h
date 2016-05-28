@@ -36,6 +36,9 @@ class control{
 		//--------------------- distance, speed, height
 		void follow(float, float, float);
 
+		//----------------
+		void set_rc(raw_rc_frame);
+
 		// ---------- throttle
 		void throttle(uint16_t);
 

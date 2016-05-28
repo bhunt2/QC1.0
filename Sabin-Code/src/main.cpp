@@ -4,15 +4,20 @@
 #include <exception>
 #include <termios.h>
 #include <fcntl.h>
-#include <curses.h>
+#include <thread>
+#include <mutex>
 
 #include "msp_frames.h"
 #include "types.h"
 #include "request.h"
 #include "control.h"
 
-void throttle_test();
+void control_test();
+void thread_control(raw_rc_frame);
+int kbhit();
+void nonblock();
 
+std::mutex mtx;
 request read_me;
 control drone_ctrl;
 
@@ -38,7 +43,7 @@ int main(int argc, char* argv[]){
 		HOVER,
 		MODELREAD,
 		MODEL,
-		THROTTLE,
+		CONTROL,
 		UNKNOWN
 	};
 
@@ -89,9 +94,9 @@ int main(int argc, char* argv[]){
 	{
 		SETCMD = MODEL;
 	}
-	else if(strcmp(argv[1], "throttle") == 0)
+	else if(strcmp(argv[1], "control") == 0)
 	{
-		SETCMD = THROTTLE;
+		SETCMD = CONTROL;
 	}
 	else
 	{
@@ -103,7 +108,7 @@ int main(int argc, char* argv[]){
 		
 		case IDENT:
 			read_me.request_ident();
-
+ 
 			break;
 
 		case ATT:
@@ -159,9 +164,9 @@ int main(int argc, char* argv[]){
 			drone_ctrl.get_model();
 			break;
 
-		case THROTTLE:
+		case CONTROL:
 
-			throttle_test();
+			control_test();
 			break;
 
 		case UNKNOWN:
@@ -174,108 +179,122 @@ int main(int argc, char* argv[]){
 	
 }
 
-void throttle_test(){
-
-	control drone_ctrl;
-
-	uint16_t throttle = 1100;
-	
-	int c;
-	nodelay(stdscr, TRUE);
-	initscr();
-	cbreak();
-  	timeout(0);
-
-  	drone_ctrl.arm();
- 
-	for (;;) {
-
-		c = getch();
-
-	 	printf("\n\n****throttle: %d****\n\n", throttle);
-		drone_ctrl.throttle(throttle);
-
-	 	if (c == 'w')
-		{
-			throttle += 1;
-			drone_ctrl.throttle(throttle);
-		}
-
-		if (c == 's')
-		{
-			throttle -= 1;
-			drone_ctrl.throttle(throttle);
-		}
-
-		if (c == 'x')
-		{
-			drone_ctrl.disarm();
-			break;
-		}
-	}
-
-	endwin();
-
-/*
-	struct termios oldSettings, newSettings;
-
-    tcgetattr( fileno( stdin ), &oldSettings );
-    newSettings = oldSettings;
-    newSettings.c_lflag &= (~ICANON & ~ECHO);
-    tcsetattr( fileno( stdin ), TCSANOW, &newSettings );
-
-	char c;
-	fd_set set;
+int kbhit()
+{
     struct timeval tv;
-
+    fd_set fds;
     tv.tv_sec = 0;
     tv.tv_usec = 0;
+    FD_ZERO(&fds);
+    FD_SET(STDIN_FILENO, &fds); //STDIN_FILENO is 0
+    select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
+    return FD_ISSET(STDIN_FILENO, &fds);
+}
 
-    while (1)
+void nonblock(int state)
+{
+    struct termios ttystate;
+ 
+    //get the terminal state
+    tcgetattr(STDIN_FILENO, &ttystate);
+ 
+    if (state==1)
     {
-    	if (!armed)
-    	{
-    		drone_ctrl.arm();
-    		armed = true;
-    	}else{
-    		printf("\n\n****throttle: %d****\n\n", throttle);
-			drone_ctrl.throttle(throttle);
-    	}
-
-        FD_ZERO( &set );
-        FD_SET( fileno( stdin ), &set );
-
-        int res = select( fileno( stdin )+1, &set, NULL, NULL, &tv );
-
-        if( res > 0 )
-        {
-            
-            read( fileno( stdin ), &c, 1 );
-
-            if (c == 'w')
-			{
-				throttle += 1;
-				drone_ctrl.throttle(throttle);
-			}
-
-			if (c == 's')
-			{
-				throttle -= 1;
-				drone_ctrl.throttle(throttle);
-			}
-			if (c == 'x')
-			{
-				drone_ctrl.disarm();
-				break;
-			}
-        }
-        else if( res < 0 )
-        {
-            perror( "select error" );
-            break;
-        } 
+        //turn off canonical mode
+        ttystate.c_lflag &= ~ICANON;
+        //minimum of number input read.
+        ttystate.c_cc[VMIN] = 1;
     }
+    else if (state==0)
+    {
+        //turn on canonical mode
+        ttystate.c_lflag |= ICANON;
+    }
+    //set the terminal attributes.
+    tcsetattr(STDIN_FILENO, TCSANOW, &ttystate);
+ 
+}
 
-    tcsetattr( fileno( stdin ), TCSANOW, &oldSettings );
-    */
+void control_test(){
+
+	raw_rc_frame rc_frame;
+	rc_frame.yaw = 1500;
+	rc_frame.throttle = 1100;
+	
+	raw_rc_frame alt_hold;
+	alt_hold.yaw = 1500;
+	alt_hold.aux1 = 1500;
+
+	char c;
+    int i=0;
+ 
+    nonblock(1);
+
+    std::thread controlThread; 
+
+    drone_ctrl.arm();
+
+    while(!i)
+    {
+        i = kbhit();
+
+        if (i!= 0)
+        {
+            c = fgetc(stdin);
+
+            switch(c){
+        		case 'w':
+        		rc_frame.throttle += 1;
+        		break;
+
+        		case 's':
+        		rc_frame.throttle -= 1;
+        		break;
+
+				case 'a':
+				rc_frame.pitch -= 1;
+        		break;
+
+        		case 'd':
+        		rc_frame.pitch += 1;
+        		break;
+
+        		case 'h':
+        		drone_ctrl.set_rc(alt_hold);
+        		break;
+
+        		case 'x':
+        		drone_ctrl.disarm();
+        		return;
+        		break;
+
+        		default:
+        			break;
+        	}
+        	i = 0;
+        }else{
+        	i = 0;
+        	controlThread = std::thread(thread_control, rc_frame); 
+        } // End if check for input
+        
+        if (controlThread.joinable())
+        {
+        	controlThread.join();
+        }
+
+		//printf("\n%d\n", rc_frame.throttle);
+    } // End while
+    
+    nonblock(0);
+
+}
+
+void thread_control(raw_rc_frame rc_f){
+	mtx.lock();
+	drone_ctrl.set_rc(rc_f);
+
+	raw_rc_frame rc = read_me.request_rc_values();
+
+	printf("roll: %u\t pitch: %u\t yaw: %u\t throttle: %u\n", rc.roll, rc.pitch, rc.yaw, rc.throttle);
+	mtx.unlock();
 }

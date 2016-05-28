@@ -429,9 +429,13 @@ std::string protocol::read(){
 		else
 		{
 			to_counter += 1;
-			if(to_counter == 1000)
+			if(to_counter == 1000 )
 			{
-				std::cout << "No Serial Data Available.\n" << std::endl;
+				if (debug)
+				{
+					std::cout << "No Serial Data Available.\n" << std::endl;
+				}
+				
 				usleep(1000);
 			}
 			

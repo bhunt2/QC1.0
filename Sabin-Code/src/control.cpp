@@ -109,6 +109,10 @@ void control::disarm(){
 	set_flight_controls(disarm_frame);
 }
 
+void control::set_rc(raw_rc_frame rc_frame){
+	set_flight_controls(rc_frame);
+}
+
 void control::follow(float distance, float speed, float height){
 
 	// Calculate the Throtle and Pitch here with the given paramter here

@@ -16,7 +16,7 @@ drone: main.o protocol.o control.o request.o parsers.o types.o
 
 # Create main object
 main.o: main.cpp
-	$(CC) $(CFLAGS) $(GGDB) -c main.cpp
+	$(CC) -std=c++11 $(CFLAGS) $(GGDB) -c main.cpp
 
 # Create Protocol object
 protocol.o: protocol.cpp
