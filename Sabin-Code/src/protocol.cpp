@@ -13,12 +13,12 @@
 	///////////////////////////////////////////////
 */
 
-protocol::protocol(bool protocol_debug){
+protocol::protocol(){
 	setup_uart();
 
 	curr_state = start;
 
-	internal_debug = protocol_debug;
+	//debug = false;
 }
 
 protocol::~protocol(){
@@ -31,6 +31,7 @@ protocol::~protocol(){
 	////////////////////////////////////
 */
 
+
 /*
 read_frame protocol::request_data_frame(uint8_t opcode){
 
@@ -41,6 +42,7 @@ read_frame protocol::request_data_frame(uint8_t opcode){
 	return read_new();
 }
 */
+
 
 // Only takes in command code
 // and reads the response back
@@ -300,7 +302,7 @@ void protocol::msp_command(uint8_t opcode, uint8_t data_length, uint16_t* params
 	// Send packed frame
     device->writeStr(frame_string);
 
-	if(debug == 1 && internal_debug)
+	if(debug)
 	{
 		std::cout << "\n\n\t\t" << "Header\t     Size\t      Command\t       CRC\n";
 		std::cout << "Sending Frame:\t";
@@ -342,53 +344,29 @@ read_frame protocol::read_new(){
 
 	while(true && no_data < 3){
 		if (device->dataAvailable())
-		{
-			std::string r = device->readStr(1);
-
-			switch(curr_state){
-
-				case start:
-				case header:
-
-					if (r == "$"){
-						r_frame.header.append("$");
-						curr_state = header;
-					}
-					if(r == "M"){
-						r_frame.header.append("M");
-						curr_state = header;
-					}
-					if(r == ">"){
+		{	
+			if (device->readStr(1) == "$")
+			{
+				r_frame.header.append("$");
+				if (device->readStr(1) == "M")
+				{
+					r_frame.header.append("M");
+					if (device->readStr(1) == ">")
+					{
 						r_frame.header.append(">");
-						curr_state = payloadsize;
+						
+						//r_frame.payload_size = ((uint8_t)strtoul(device->readStr(1).c_str(), NULL, 0))&0xff;
+						//r_frame.opcode = ((uint8_t)strtoul(device->readStr(1).c_str(), NULL, 0))&0xff;
+						//r_frame.payload.append(device->readStr(r_frame.payload_size));
 					}
-
-					break;
-
-				case payloadsize:
-					r_frame.payload_size = ((uint8_t)strtoul(r.c_str(), NULL, 0))&0xff;
-					curr_state = opcode;
-					break;
-
-				case opcode:
-					r_frame.opcode = ((uint8_t)strtoul(r.c_str(), NULL, 0))&0xff;
-					curr_state = payload;
-					break;
-
-				case payload:
-					r_frame.payload.append(r);
-					curr_state = payload;
-					break;
-				default:
-					break;
-			} // End Switch
-
+				}
+			}else{
+				std::cout << string_to_hex(device->readStr(1));
+			}
 		}else{
 			no_data++;
-			usleep(1000);
-		} // End data available check
-
-	} // End while loop
+		}
+	}
 
 	return r_frame;
 }
@@ -411,7 +389,7 @@ std::string protocol::read(){
 			// Get known frame size back for now
 			buf.append(device->readStr(1));
 			
-			if(debug == 1 && internal_debug)
+			if(debug)
 			{
 				// State data is available only on the first byte
 				if(bytes_ctr == 0)
@@ -442,7 +420,7 @@ std::string protocol::read(){
 		}
 	}while(to_counter < 1000);
 	
-	if(debug == 1 && internal_debug)
+	if(debug)
 	{
 		std::cout << "Number of bytes received: " << bytes_ctr << std::endl;
 	}

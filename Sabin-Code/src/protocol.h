@@ -11,8 +11,6 @@ class protocol
 {
 
 private:
-	
-	bool internal_debug;
 
 	// Read Parse State
 	enum state
@@ -73,7 +71,7 @@ private:
 	uint8_t read8();
 
 public:
-	protocol(bool);
+	protocol();
 
 	~protocol();
 

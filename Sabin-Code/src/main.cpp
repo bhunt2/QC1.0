@@ -5,7 +5,7 @@
 #include <termios.h>
 #include <fcntl.h>
 #include <thread>
-#include <mutex>
+//#include <mutex>
 
 #include "msp_frames.h"
 #include "types.h"
@@ -14,16 +14,15 @@
 
 void control_test();
 void thread_control(raw_rc_frame);
+void thread_read();
 int kbhit();
 void nonblock();
 
-std::mutex mtx;
 request read_me;
 control drone_ctrl;
 
 int main(int argc, char* argv[]){
 	
-	std::cout << "Debug is =>" << debug << std::endl;
 
 	if (argc <= 1)
 	{
@@ -149,8 +148,6 @@ int main(int argc, char* argv[]){
 
 		case HOVER:
 			{
-				control drone_ctrl;
-
 				uint16_t throttle = (uint16_t) strtoul(argv[2], NULL, 0);
 				int seconds = (int) strtoul(argv[3], NULL, 0);
 				int step = (int) strtoul(argv[4], NULL, 0);
@@ -160,7 +157,6 @@ int main(int argc, char* argv[]){
 			}
 			
 		case MODEL:
-			control drone_ctrl;
 			drone_ctrl.get_model();
 			break;
 
@@ -217,22 +213,23 @@ void nonblock(int state)
 
 void control_test(){
 
-	raw_rc_frame rc_frame;
-	rc_frame.yaw = 1500;
-	rc_frame.throttle = 1100;
-	
-	raw_rc_frame alt_hold;
-	alt_hold.yaw = 1500;
-	alt_hold.aux1 = 1500;
-
 	char c;
     int i=0;
  
     nonblock(1);
 
     std::thread controlThread; 
+    std::thread readThread;
 
     drone_ctrl.arm();
+
+    raw_rc_frame rc_frame;
+	rc_frame.yaw = 1500;
+	rc_frame.throttle = 1100;
+	
+	raw_rc_frame alt_hold;
+	alt_hold.yaw = 1500;
+	alt_hold.aux1 = 1500;
 
     while(!i)
     {
@@ -274,12 +271,20 @@ void control_test(){
         	i = 0;
         }else{
         	i = 0;
+        	
         	controlThread = std::thread(thread_control, rc_frame); 
+        	readThread = std::thread(thread_read);
+        	
         } // End if check for input
         
         if (controlThread.joinable())
         {
         	controlThread.join();
+        }
+
+        if (readThread.joinable())
+        {
+        	readThread.join();
         }
 
 		//printf("\n%d\n", rc_frame.throttle);
@@ -289,12 +294,13 @@ void control_test(){
 
 }
 
+void thread_read(){
+    //read_me.request_rc_values();
+
+	//printf("roll: %u\t pitch: %u\t yaw: %u\t throttle: %u aux1: %u\n", rc.roll, rc.pitch, rc.yaw, rc.throttle, rc.aux1);
+}
+
 void thread_control(raw_rc_frame rc_f){
-	mtx.lock();
 	drone_ctrl.set_rc(rc_f);
 
-	raw_rc_frame rc = read_me.request_rc_values();
-
-	printf("roll: %u\t pitch: %u\t yaw: %u\t throttle: %u\n", rc.roll, rc.pitch, rc.yaw, rc.throttle);
-	mtx.unlock();
 }

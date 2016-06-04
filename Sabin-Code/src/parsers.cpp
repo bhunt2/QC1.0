@@ -14,7 +14,7 @@
 	///////////////////////////////////////////////
 */
 
-	//parsers::parsers(){	}
+	//parsers::parsers(){	debug = false;}
 
 
 	//parsers::~parsers(){}
@@ -35,9 +35,8 @@ ident_frame parsers::evaluate_identification(std::string data){
 	if(debug){
 
 		std::cout << "Response: " << data << "\n" << std::endl;
+		printf("version: %d\n", ident.version);
 	}
-	
-	printf("version: %d\n", ident.version);
 
 	return ident;
 
@@ -146,16 +145,20 @@ raw_rc_frame parsers::evaluate_raw_rc(std::string rx_frame){
 
 	raw_rc_frame rc;
 
+
 	if (rx_frame.empty())
 	{
+		std::cout << "Empty frame from Flight Controller." << std::endl;
 		return rc;
 	}
 
 	// 22 is expected number of bytes
 	if (rx_frame.length() < 22)
 	{
+		std::cout << "Less than 22 bytes received." << std::endl;
 		return rc;
 	}
+
 
 	
 	std::string temp;
