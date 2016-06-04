@@ -9,6 +9,7 @@
 
 class control{
 	private:
+
 		enum control_state{
 			START,
 			ARM,
@@ -46,7 +47,7 @@ class control{
 		void move_forward(uint16_t, uint16_t);
 
 		//--------max_throttle, time_to_hover_in_seconds, step value to increase throttle
-		void hover(uint16_t, int, int);
+		void hover(int);
 
 };
 

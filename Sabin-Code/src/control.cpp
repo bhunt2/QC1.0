@@ -15,7 +15,7 @@
 	///////////////////////////////////////////////
 */
 
-//control::control(){}
+//control::control(){debug = false;}
 
 //control::~control(){}
 
@@ -42,7 +42,7 @@ void control::set_flight_controls(raw_rc_frame frame){
 
 	uint16_t payload[payload_size] = {frame.roll, frame.pitch, frame.yaw, frame.throttle, frame.aux1, 0, 0, 0};
 	
-	protocol msp_protocol(false);
+	protocol msp_protocol;
 
 	msp_protocol.set_rc(msp_set_raw_rc, payload_size, payload);
 }
@@ -142,7 +142,7 @@ void control::move_forward(uint16_t throttle_set_val, uint16_t pitch_set_val){
 }
 
 
-void control::hover(uint16_t max_throttle, int hover_time, int step){
+void control::hover(int target_alt){
 
 	raw_rc_frame hover_frame;
 	raw_rc_frame alt_hold;
@@ -155,8 +155,7 @@ void control::hover(uint16_t max_throttle, int hover_time, int step){
 
 	uint16_t start_throttle = hover_frame.throttle; // min throttle
 
-	time_t startTime = 0,
-			elapsedTime = 0;
+	time_t startTime = 0,elapsedTime = 0;
 
 	//parsers parse;
 	//protocol p(false);
