@@ -151,7 +151,11 @@ void control::hover_with_msp_set_alt(uint32_t target_alt){
 
 	control_state ctrl_state = ARM;
 
+	raw_rc_frame throttle_frame;
+	throttle_frame.throttle = 1500;
+
 	raw_rc_frame hover_frame;
+	hover_frame.aux1 = 1500;
 
 	switch(ctrl_state){
 		case ARM:
@@ -159,8 +163,7 @@ void control::hover_with_msp_set_alt(uint32_t target_alt){
 			ctrl_state = INCTHROTTLE;
 			break;
 		case INCTHROTTLE:
-			hover_frame.throttle = 1500;
-			set_flight_controls(hover_frame);
+			set_flight_controls(throttle_frame);
 			ctrl_state = HOLD;
 			break;
 		case HOLD:
@@ -168,6 +171,7 @@ void control::hover_with_msp_set_alt(uint32_t target_alt){
 			ctrl_state = KEEP;
 			break;
 		case KEEP:
+			set_flight_controls(hover_frame);
 			break;
 		default:
 			break;
@@ -178,10 +182,10 @@ void control::hover_with_msp_set_alt(uint32_t target_alt){
 void control::hover(int target_alt){
 
 /*
-	raw_rc_frame hover_frame;
+	raw_rc_frame hover_frame;hover_frame.throttle += 110;
 	raw_rc_frame alt_hold;
 	hover_frame.yaw = 1500;
-	hover_frame.throttle += 110;
+	
 
 	control_state ctrl_state = ARM;
 

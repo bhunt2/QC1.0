@@ -1,3 +1,14 @@
+
+/********************************************************
+	Drone Control and Automation Code
+	--------------------------------------------
+
+	Written By: Sabin Maharjan
+	Date: May 2, 2016
+
+**********************************************************/
+
+// System Includes
 #include <unistd.h>
 #include <stdio.h>
 #include <iostream>
@@ -7,22 +18,37 @@
 #include <thread>
 //#include <mutex>
 
-#include "msp_frames.h"
+// Custom Header file includes
+#include "msp_frames.h" 
 #include "types.h"
 #include "request.h"
 #include "control.h"
 
+// Function Decleration for testing of the drone's control from keyboard
+// Right now throttle can be increased and decreased with "w" and "s" key respectively
+// Pitch can be increased and decreased with "d" and "a" key respectively
+// c++ doesn't support async keybooard input out of the box  
 void control_test();
+
+// Threading for the control command to send the rc frame 
 void thread_control(raw_rc_frame);
+
+// Threading for the read command to read the rc frame
 void thread_read();
+
+// Non blocking key input setup for C++
 int kbhit();
 void nonblock();
 
+// Read and Control instantiation
 request read_me;
 control drone_ctrl;
 
+
+// --------------- Start
 int main(int argc, char* argv[]){
 	
+	// Get at least one argument for command
 
 	if (argc <= 1)
 	{
@@ -31,22 +57,24 @@ int main(int argc, char* argv[]){
 		return 0;
 	}
 
-
+	// List of the supported terminal commands
 	enum CMD{
-		ATT,
-		ALT,
-		RCREAD,
-		IDENT,
-		ARM,
-		DISARM,
-		HOVER,
-		MODELREAD,
-		MODEL,
-		CONTROL,
-		UNKNOWN
+		ATT, // 	./drone att
+		ALT, // 	./drone alt
+		RCREAD, // 	./drone rc-read
+		IDENT, // 	./drone ident
+		ARM, // 	./drone arm
+		DISARM, // 	./drone disarm
+		HOVER, // 	./drone hover <target altitude>
+		MODEL, // 	./drone model 
+		CONTROL, // ./drone control
+		UNKNOWN // 	Unknown command
 	};
 
+	// Default is UNKNOWN command
 	CMD SETCMD = UNKNOWN;
+
+	// Check the commands from users and set appropirate CMD 
 
 	if (strcmp(argv[1], "att") == 0)	
 	{
@@ -101,6 +129,13 @@ int main(int argc, char* argv[]){
 	{
 		SETCMD = UNKNOWN;
 	}
+
+
+	/***************************************************************
+		After the CMD has been set from the user's input,
+		The switch statements below actually executes the functions
+		associated with user's input
+	***************************************************************/
 
 	switch(SETCMD)
 	{
@@ -172,6 +207,7 @@ int main(int argc, char* argv[]){
 	return 0;
 	
 }
+
 
 int kbhit()
 {

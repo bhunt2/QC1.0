@@ -61,7 +61,7 @@ struct raw_rc_frame {
 		pitch(1500),
 		yaw(1000),
 		throttle(1000),
-		aux1(0)
+		aux1(1000)
 		{}
 };
 
