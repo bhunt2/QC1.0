@@ -79,9 +79,9 @@ int main(int argc, char* argv[]){
 	}
 	else if (strcmp(argv[1], "hover") == 0)
 	{
-		if (argv[2] == NULL || argv[3] == NULL || argv[3] == NULL)
+		if (argv[2] == NULL )
 		{
-			std::cout << "3 arguments expected! [max_throtte, hover_time, throttle_step]" << std::endl;
+			std::cout << "1 arguments expected! [target_alt]" << std::endl;
 
 			return 0;
 		}
@@ -148,11 +148,9 @@ int main(int argc, char* argv[]){
 
 		case HOVER:
 			{
-				uint16_t throttle = (uint16_t) strtoul(argv[2], NULL, 0);
-				int seconds = (int) strtoul(argv[3], NULL, 0);
-				int step = (int) strtoul(argv[4], NULL, 0);
+				int target_alt = (int) strtoul(argv[2], NULL, 0);
 
-				drone_ctrl.hover(throttle, seconds, step);
+				drone_ctrl.hover_with_msp_set_alt(target_alt);
 				break;
 			}
 			

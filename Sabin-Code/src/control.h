@@ -22,6 +22,8 @@ class control{
 
 		void set_flight_controls(raw_rc_frame);
 
+		void set_alt(uint32_t);
+
 
 	public:
 		//control();
@@ -46,8 +48,10 @@ class control{
 		// -------------- throttle, pitch
 		void move_forward(uint16_t, uint16_t);
 
-		//--------max_throttle, time_to_hover_in_seconds, step value to increase throttle
+		//--------Target Altitude
 		void hover(int);
+
+		void hover_with_msp_set_alt(uint32_t);
 
 };
 

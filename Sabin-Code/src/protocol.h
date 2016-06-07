@@ -68,7 +68,6 @@ private:
 
 	std::string string_to_hex(const std::string&);
 
-	uint8_t read8();
 
 public:
 	protocol();
@@ -83,6 +82,8 @@ public:
 	//------------opcode, payload size, payload
 	void set_rc(uint8_t, uint8_t, uint16_t[12]);
 
+	void set_alt(uint32_t);
+
 	//This method takes in MSP code to request values associated with the code from Flight Controller
 	// --------------------- opcode
 	std::string request_data(uint8_t);
@@ -90,6 +91,8 @@ public:
 	//This method sends the payload to flight controller and expects response payload in return associated with the opcodes
 	//---------------------- opcoode, payloadsize, payload
 	std::string request_data(uint8_t, uint8_t, uint16_t*);
+
+
 	 
 };
 

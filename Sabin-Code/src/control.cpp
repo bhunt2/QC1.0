@@ -47,6 +47,12 @@ void control::set_flight_controls(raw_rc_frame frame){
 	msp_protocol.set_rc(msp_set_raw_rc, payload_size, payload);
 }
 
+void control::set_alt(uint32_t alt){
+	protocol msp_protocol;
+
+	msp_protocol.set_alt(alt);
+}
+
 
 /*
 	///////////////////////////////////////////////
@@ -141,9 +147,37 @@ void control::move_forward(uint16_t throttle_set_val, uint16_t pitch_set_val){
 	set_flight_controls(move_frame);
 }
 
+void control::hover_with_msp_set_alt(uint32_t target_alt){
+
+	control_state ctrl_state = ARM;
+
+	raw_rc_frame hover_frame;
+
+	switch(ctrl_state){
+		case ARM:
+			arm();
+			ctrl_state = INCTHROTTLE;
+			break;
+		case INCTHROTTLE:
+			hover_frame.throttle = 1500;
+			set_flight_controls(hover_frame);
+			ctrl_state = HOLD;
+			break;
+		case HOLD:
+			set_alt(target_alt);
+			ctrl_state = KEEP;
+			break;
+		case KEEP:
+			break;
+		default:
+			break;
+	}
+}
+
 
 void control::hover(int target_alt){
 
+/*
 	raw_rc_frame hover_frame;
 	raw_rc_frame alt_hold;
 	hover_frame.yaw = 1500;
@@ -155,7 +189,7 @@ void control::hover(int target_alt){
 
 	uint16_t start_throttle = hover_frame.throttle; // min throttle
 
-	time_t startTime = 0,elapsedTime = 0;
+	//time_t startTime = 0,elapsedTime = 0;
 
 	//parsers parse;
 	//protocol p(false);
@@ -175,15 +209,8 @@ void control::hover(int target_alt){
 			case INCTHROTTLE:
 
 				hover_frame.throttle += step;
-				if (hover_frame.throttle < max_throttle)
-				{
-					
-					set_flight_controls(hover_frame);
 
-					ctrl_state = INCTHROTTLE;
-				}else{
-					ctrl_state = HOLD;
-				}
+				set_flight_controls(hover_frame);
 
 				break;
 
@@ -195,6 +222,7 @@ void control::hover(int target_alt){
 				ctrl_state = HOLD;
 				break;
 
+			
 			case KEEP:
 				
 				if (startTime == 0){ startTime = time(NULL);}
@@ -214,6 +242,7 @@ void control::hover(int target_alt){
 				}
 
 				break;
+	
 
 			case DECTHROTTLE:
 
@@ -247,5 +276,7 @@ void control::hover(int target_alt){
 		//parse.evaluate_raw_rc(p.request_data(msp_altitude));
 		//usleep(300);
 	} // end while
+
+	*/
 }
 

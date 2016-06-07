@@ -50,8 +50,6 @@ std::string protocol::request_data(uint8_t opcode){
 
 	msp_request(opcode);
 
-	usleep(500);
-
 	return read();
 
 }
@@ -63,10 +61,45 @@ std::string protocol::request_data(uint8_t opcode, uint8_t param_length, uint16_
 
 	msp_command(opcode, param_length, params);
 
-	usleep(500);
-
 	return read();
 
+}
+
+void protocol::set_alt(uint32_t alt){
+	char msp_string[20];
+
+	uint8_t checksum = 0;
+
+	uint8_t ploadsize = 4;
+
+	msp_string[0]=ploadsize*8 & 0xff;
+    
+    checksum ^= (ploadsize*8 & 0xFF);
+    
+    msp_string[1]=opcode & 0xff;
+    
+    checksum ^= (opcode & 0xFF);
+
+    msp_string[2] = alt & 0xFF;
+    msp_string[3] = (alt>> 8) & 0xFF;
+    msp_string[4] = (alt >> 16) & 0xFF;
+    msp_string[5] = (alt >> 24) & 0xFF; 
+    
+    checksum ^= alt;
+
+    msp_string[ploadsize+2]= checksum;
+
+	std::ostringstream buf;
+
+    // Add header to the buffer
+    buf << to_fc_header;
+
+    for(int i = 0; i < 20; i++){
+    	buf << msp_string[i];
+    }
+
+    // Send the buffer data to Flight Controller
+    device->writeStr(buf.str());
 }
 
 
@@ -445,26 +478,4 @@ std::string protocol::string_to_hex(const std::string& input)
         output.push_back(lut[c & 15]);
     }
     return output;
-}
-
-/*
-uint32_t protocol::read32() {
-  uint32_t t = read16();
-  t+= (uint32_t)read16()<<16;
-  return t;
-}
-
-uint16_t protocol::read16() {
-  uint16_t t = read8();
-  t+= (uint16_t)read8()<<8;
-  return t;
-}
-
-*/
-
-uint8_t protocol::read8()  {
-  // Read byte
-  uint8_t c = (uint8_t)strtoul(device->readStr(1).c_str(), NULL, 0);
-  //checksum ^= c;
-  return (c)&0xff;
 }

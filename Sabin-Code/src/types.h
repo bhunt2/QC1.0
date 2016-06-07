@@ -12,9 +12,11 @@ extern uint8_t msp_attitude;
 
 extern uint8_t msp_altitude;
 
+extern uint8_t msp_read_rc;
+
 extern uint8_t msp_set_raw_rc;
 
-extern uint8_t msp_read_rc;
+extern uint8_t msp_set_alt;
 
 extern const char* to_fc_header;
 

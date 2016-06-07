@@ -101,7 +101,7 @@ altitude_frame parsers::evaluate_altitude(std::string rx_frame){
 	altitude_frame alt_frame;
 
 
-	if (rx_frame.substr(5,10).empty())
+	if (rx_frame.length() == 0)
 	{
 		if (debug)
 		{
@@ -135,7 +135,7 @@ altitude_frame parsers::evaluate_altitude(std::string rx_frame){
 
 		std::cout << "Response: " << rx_frame << "\n" << std::endl;
 
-		printf("est altitude: %d cm \tVario: %d cm/s\n", alt_frame.est_alt, alt_frame.vario);
+		printf("est altitude: %0.2f m \tVario: %0.2f m/s\n", (float)(alt_frame.est_alt/100), (float)(alt_frame.vario/100));
 	}
 
 	return alt_frame;
