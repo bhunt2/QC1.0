@@ -1,12 +1,15 @@
 
-/********************************************************
+/****************************************************************
 	Drone Control and Automation Code
 	--------------------------------------------
-
+	Capstone Project: Object Following Drone
+	Sponsor: Benjamin Huntsman
+	Advisor: Dr. McNames, James
 	Written By: Sabin Maharjan
 	Date: May 2, 2016
-
-**********************************************************/
+	Version: 1.0
+	Github: https://github.com/bhunt2/QC1.0/tree/master/Src/Control
+*******************************************************************/
 
 // System Includes
 #include <unistd.h>
@@ -183,14 +186,14 @@ int main(int argc, char* argv[]){
 
 		case HOVER:
 			{
-				int target_alt = (int) strtoul(argv[2], NULL, 0);
+				int32_t target_alt = (int) strtoul(argv[2], NULL, 0);
 
 				drone_ctrl.hover_with_msp_set_alt(target_alt);
 				break;
 			}
 			
 		case MODEL:
-			drone_ctrl.get_model();
+			drone_ctrl.get_model("model.txt");
 			break;
 
 		case CONTROL:
