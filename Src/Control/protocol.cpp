@@ -70,24 +70,27 @@ void protocol::set_alt(uint32_t alt){
 
 	uint8_t checksum = 0;
 
-	uint8_t ploadsize = 4;
+	uint8_t ploadsize = 1;
 
-	msp_string[0]=ploadsize*8 & 0xff;
-    
-    checksum ^= (ploadsize*8 & 0xFF);
+	msp_string[0]=ploadsize*4 & 0xff;
+    checksum ^= (ploadsize*4 & 0xFF);
     
     msp_string[1]=opcode & 0xff;
-    
     checksum ^= (opcode & 0xFF);
 
+    // 4 bytes of data
     msp_string[2] = alt & 0xFF;
-    msp_string[3] = (alt>> 8) & 0xFF;
-    msp_string[4] = (alt >> 16) & 0xFF;
-    msp_string[5] = (alt >> 24) & 0xFF; 
+    msp_string[4] = (alt >> 8) & 0xFF;
+    msp_string[6] = (alt >> 16) & 0xFF;
+    msp_string[8] = (alt >> 24) & 0xFF; 
     
-    checksum ^= alt;
+    // Calcuate the checksum
+    for (int i = 2; i <= 8; i++)
+    {
+    	checksum ^= msp_string[i];
+    }
 
-    msp_string[ploadsize+2]= checksum;
+    msp_string[10]= checksum;
 
 	std::ostringstream buf;
 
@@ -109,8 +112,8 @@ void protocol::set_rc(uint8_t opcode, uint8_t ploadsize, uint16_t pload_in[12]){
 
     time_t start = difftime(time(NULL),0);
 
-    //unsigned int microseconds = 1000000;
-
+    // To prevent legacy RX to take over, check the timer to see if the time passes is less than half a second
+    // if it is then keep sending the RC values.
     while (timer < 0.5){
 
 	    char msp_string[20];
@@ -405,6 +408,9 @@ read_frame protocol::read_new(){
 }
 */
 
+// Brute force way of rading from Flight Controller
+// new read method is built but haven't fully tested
+// This methods is tested and works but in future revert back to new method read_new()
 std::string protocol::read(){
 	// Establish variables for use in receiving data
 	
@@ -459,11 +465,9 @@ std::string protocol::read(){
 	}
 	
 	return buf;
-
-
 }
 
-
+// For debugging purpose only
 std::string protocol::string_to_hex(const std::string& input)
 {
     static const char* const lut = "0123456789ABCDEF";

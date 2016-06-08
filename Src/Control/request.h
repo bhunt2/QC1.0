@@ -1,4 +1,15 @@
 
+/****************************************************************
+	Drone Control and Automation Code
+	--------------------------------------------
+	Capstone Project: Object Following Drone
+	Sponsor: Benjamin Huntsman
+	Advisor: Dr. McNames, James
+	Written By: Sabin Maharjan
+	Date: May 2, 2016
+	Version: 1.0
+	Github: https://github.com/bhunt2/QC1.0/tree/master/Src/Control
+*******************************************************************/
 
 #include "msp_frames.h"
 #include "protocol.h"

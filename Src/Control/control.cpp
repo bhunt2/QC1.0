@@ -7,7 +7,7 @@
 
 #include "control.h"
 #include "types.h"
-#include "parsers.h"
+#include "request.h"
 
 /*
 	///////////////////////////////////////////////
@@ -44,9 +44,11 @@ void control::set_flight_controls(raw_rc_frame frame){
 	
 	protocol msp_protocol;
 
+	// Send the RC values to be set on Flight Controller
 	msp_protocol.set_rc(msp_set_raw_rc, payload_size, payload);
 }
 
+// Sends the target alittide bo be held once the drone is in the air
 void control::set_alt(uint32_t alt){
 	protocol msp_protocol;
 
@@ -60,9 +62,10 @@ void control::set_alt(uint32_t alt){
 	///////////////////////////////////////////////
 */
 
-model control::get_model(){
+model control::get_model(std::string path){
 
-	std::ifstream infile("model.txt");
+	// set the file to be read
+	std::ifstream infile(path.c_str());
 
 	model m;
 
@@ -76,12 +79,14 @@ model control::get_model(){
 		return m;
 	}
 
+	// File is good and start reading line
 	std::string line;
 
 	while(std::getline(infile, line)){
 
 		std::istringstream iss(line);
 
+		// Space delimated with distance speed and height in order
 	    if (!(iss >> m.distance >> m.speed >> m.height)) { break; } // error
 
 	    if (debug)
@@ -99,10 +104,10 @@ void control::arm(){
 
 	raw_rc_frame arm_frame;
 
+	// the sequence value of yaw to be armed
 	arm_frame.yaw = 2000;
 
-	set_flight_controls(arm_frame);
-	
+	set_flight_controls(arm_frame);	
 }
 
 
@@ -112,6 +117,7 @@ void control::disarm(){
 	
 	raw_rc_frame disarm_frame;
 
+	// default raw rc frame is is set to disarm
 	set_flight_controls(disarm_frame);
 }
 
@@ -132,6 +138,7 @@ void control::follow(float distance, float speed, float height){
 
 void control::throttle(uint16_t throttle_set_val){
 	raw_rc_frame a_frame;
+
 	a_frame.yaw = 1500;
 	a_frame.throttle = throttle_set_val;
 
@@ -147,7 +154,7 @@ void control::move_forward(uint16_t throttle_set_val, uint16_t pitch_set_val){
 	set_flight_controls(move_frame);
 }
 
-void control::hover_with_msp_set_alt(uint32_t target_alt){
+void control::hover_with_msp_set_alt(int32_t target_alt){
 
 	control_state ctrl_state = ARM;
 
@@ -179,24 +186,21 @@ void control::hover_with_msp_set_alt(uint32_t target_alt){
 }
 
 
-void control::hover(int target_alt){
+void control::hover(int32_t target_alt){
 
-/*
+
 	raw_rc_frame hover_frame;hover_frame.throttle += 110;
-	raw_rc_frame alt_hold;
-	hover_frame.yaw = 1500;
+	raw_rc_frame alt_hold;	hover_frame.yaw = 1500;
 	
-
 	control_state ctrl_state = ARM;
 
 	bool hovering = true;
 
-	uint16_t start_throttle = hover_frame.throttle; // min throttle
+	request req;
 
-	//time_t startTime = 0,elapsedTime = 0;
+	altitude_frame alt_frame = req.request_altitude();
 
-	//parsers parse;
-	//protocol p(false);
+	int32_t start_alt = alt_frame.est_alt;
  
 	while(hovering){
 
@@ -211,56 +215,74 @@ void control::hover(int target_alt){
 				break;
 
 			case INCTHROTTLE:
+				{
 
-				hover_frame.throttle += step;
+					alt_frame = req.request_altitude();
 
-				set_flight_controls(hover_frame);
+					// Checks if target_alt is reached 
+					if (alt_frame.est_alt == target_alt)
+					{
+						// Changge state to HOLD
+						ctrl_state = HOLD;
+
+					}else{
+						// Increase throttle 
+						hover_frame.throttle += 1;
+						set_flight_controls(hover_frame);
+						ctrl_state = INCTHROTTLE;
+					}					
+				}
 
 				break;
 
 			case HOLD:
 				std::cout << "Holding Altitude..... " << std::endl;
+
 				alt_hold.yaw = 1500;
 				alt_hold.aux1 = 1500;
 				set_flight_controls(alt_hold);
-				ctrl_state = HOLD;
+
+				ctrl_state = KEEP;
 				break;
 
-			
 			case KEEP:
-				
-				if (startTime == 0){ startTime = time(NULL);}
-
-				std::cout<<"Hovering for " << hover_time << " seconds" << std::endl; 
-
-				elapsedTime = time(NULL) - startTime; 
-				
-				if(elapsedTime < hover_time){ 
-
-					ctrl_state = KEEP;
-
-					set_flight_controls(hover_frame);
-
-				} else{
-					ctrl_state = DECTHROTTLE;
-				}
-
+				// keeps hovering until Some external logic to change state to decthrottle
 				break;
-	
+
+			case FIX:
+
+				alt_frame = req.request_altitude();
+
+				// This needs to be experiments and tested
+				// We don't know how fast we want drone to descend
+				// 10 cm/s for the place holder
+				// If exceeds 10 then increase the throttle
+				if (alt_frame.vario > 10) //10cm/s 
+				{
+					hover_frame.throttle += 1;
+					set_flight_controls(hover_frame);
+				}
+				
+				ctrl_state = DECTHROTTLE;
+				break;
 
 			case DECTHROTTLE:
 
 				{
-					hover_frame.throttle -= step;
+					alt_frame = req.request_altitude();
 
-					if (hover_frame.throttle > start_throttle)
+					// Check if the start altitude is reached
+					if (alt_frame.est_alt == start_alt)
 					{
+						ctrl_state = DISARM;
+					}else{
+
+						hover_frame.throttle -= 1;
 						set_flight_controls(hover_frame);
 
-						ctrl_state = DECTHROTTLE;
-					}else{
-						ctrl_state = DISARM;
-					}	
+						// Fix throttle if descends too fast
+						ctrl_state = FIX;
+					}		
 				}
 
 				break;
@@ -277,10 +299,6 @@ void control::hover(int target_alt){
 				break;
 
 		} // end switch
-		//parse.evaluate_raw_rc(p.request_data(msp_altitude));
-		//usleep(300);
 	} // end while
-
-	*/
 }
 
