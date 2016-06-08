@@ -248,6 +248,11 @@ void nonblock(int state)
  
 }
 
+void hover_test(){
+
+	
+}
+
 void control_test(){
 
 	char c;
@@ -262,7 +267,7 @@ void control_test(){
 
     raw_rc_frame rc_frame;
 	rc_frame.yaw = 1500;
-	rc_frame.throttle = 1100;
+	rc_frame.throttle = 1500;
 	
 	raw_rc_frame alt_hold;
 	alt_hold.yaw = 1500;
@@ -278,11 +283,11 @@ void control_test(){
 
             switch(c){
         		case 'w':
-        		rc_frame.throttle += 1;
+        		rc_frame.throttle += 5;
         		break;
 
         		case 's':
-        		rc_frame.throttle -= 1;
+        		rc_frame.throttle -= 5;
         		break;
 
 				case 'a':
